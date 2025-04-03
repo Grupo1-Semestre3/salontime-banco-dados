@@ -1,50 +1,36 @@
 create database salon_time;
 
--- 	drop database salon_time;
+-- drop database salon_time;
 
 use salon_time;
 
-CREATE TABLE status_usuario (
+-- Criação das tabelas
+CREATE TABLE info_salao (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    status VARCHAR(45)
+    email VARCHAR(255),
+    telefone VARCHAR(45),
+    logradouro VARCHAR(100),
+    numero VARCHAR(10),
+    cidade VARCHAR(45),
+    estado VARCHAR(45),
+    complemento VARCHAR(45)
 );
 
 CREATE TABLE tipo_usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    descricao VARCHAR(100)
+    descricao VARCHAR(100),
+    tipo_usuariocol VARCHAR(45)
 );
 
 CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    fk_status_usuario INT,
     fk_tipo_usuario INT,
     nome VARCHAR(255),
     telefone CHAR(11),
     CPF CHAR(14),
     email VARCHAR(255),
     senha VARCHAR(255),
-    FOREIGN KEY (fk_status_usuario) REFERENCES status_usuario(id),
     FOREIGN KEY (fk_tipo_usuario) REFERENCES tipo_usuario(id)
-);
-
-CREATE TABLE horario_funcionamento (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    fk_usuario INT,
-    dia_semana ENUM('Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'),
-    inicio TIME,
-    fim TIME,
-    aberto TINYINT,
-    FOREIGN KEY (fk_usuario) REFERENCES usuario(id)
-);
-
-CREATE TABLE horario_excecao (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    fk_usuario INT,
-    data_excecao DATE,
-    inicio TIME,
-    fim TIME,
-    aberto TINYINT,
-    FOREIGN KEY (fk_usuario) REFERENCES usuario(id)
 );
 
 CREATE TABLE servico (
@@ -52,23 +38,13 @@ CREATE TABLE servico (
     nome VARCHAR(255),
     preco DECIMAL(10,2),
     tempo TIME,
-    status VARCHAR(20)
+    status VARCHAR(20),
+    simultaneo TINYINT
 );
 
 CREATE TABLE status_agendamento (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    status ENUM('Pendente', 'Confirmado', 'Cancelado', 'Concluído')
-);
-
-CREATE TABLE status_pagamento (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    status ENUM('Pendente', 'Pago', 'Cancelado')
-);
-
-CREATE TABLE pagamento (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    forma VARCHAR(45),
-    taxa DECIMAL(10,2)
+    status varchar(45)
 );
 
 CREATE TABLE agendamento (
@@ -76,100 +52,122 @@ CREATE TABLE agendamento (
     fk_servico INT,
     fk_usuario INT,
     fk_status INT,
-    fk_pagamento INT,
     data DATE,
     inicio TIME,
     fim TIME,
-    fk_funcionario INT,
-    fk_status_pagamento INT,
+    preco DECIMAL(10,2),
     FOREIGN KEY (fk_servico) REFERENCES servico(id),
-    FOREIGN KEY (fk_usuario) REFERENCES usuario(id),
     FOREIGN KEY (fk_status) REFERENCES status_agendamento(id),
-    FOREIGN KEY (fk_pagamento) REFERENCES pagamento(id),
-    FOREIGN KEY (fk_status_pagamento) REFERENCES status_pagamento(id)
+    FOREIGN KEY (fk_usuario) REFERENCES usuario(id)
 );
 
-CREATE TABLE avaliacao (
-    fk_agendamento INT,
-    nota_servico INT,
-    descricao_servico VARCHAR(255),
-    data_horario DATETIME,
-    PRIMARY KEY (fk_agendamento),
-    FOREIGN KEY (fk_agendamento) REFERENCES agendamento(id)
-);
+
 
 CREATE TABLE historico_agendamento (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    fk_agendamento INT,
-    fk_pagamento INT,
-    fk_status INT,
-    preco_final DECIMAL(10,2),
     data_horario DATETIME,
-    FOREIGN KEY (fk_agendamento) REFERENCES agendamento(id),
-    FOREIGN KEY (fk_pagamento) REFERENCES pagamento(id),
-    FOREIGN KEY (fk_status) REFERENCES status_agendamento(id)
+    agendamento_id INT,
+    agendamento_fk_servico INT,
+    agendamento_fk_usuario INT,
+    agendamento_fk_status INT,   
+    FOREIGN KEY (agendamento_id) REFERENCES agendamento(id)
 );
 
--- Inserindo alguns registros
-INSERT INTO status_usuario (status) VALUES ('Ativo'), ('Inativo');
-INSERT INTO tipo_usuario (descricao) VALUES ('Cliente'), ('Administrador');
-INSERT INTO usuario (fk_status_usuario, fk_tipo_usuario, nome, telefone, CPF, email, senha) 
-VALUES (1, 1, 'João Silva', '11987654321', '123.456.789-00', 'joao@email.com', 'senha123');
-
-INSERT INTO usuario (fk_status_usuario, fk_tipo_usuario, nome, telefone, CPF, email, senha) 
-VALUES (1, 2, 'Marina Mota', '11987654321', '223.456.789-00', 'mamotta@email.com', 'senha123');
-
-INSERT INTO servico (nome, preco, tempo, status) VALUES ('Corte de Cabelo', 50.00, '00:30:00', 'Disponível');
-
-INSERT INTO status_agendamento (status) VALUES ('Pendente'), ('Confirmado');
-INSERT INTO status_pagamento (status) VALUES ('Pendente'), ('Pago');
-INSERT INTO pagamento (forma, taxa) VALUES ('Cartão de Crédito', 5.00);
-
-INSERT INTO agendamento (fk_servico, fk_usuario, fk_status, fk_pagamento, data, inicio, fim, fk_funcionario, fk_status_pagamento)
-VALUES (1, 1, 1, 1, '2024-04-10', '15:00:00', '15:30:00', 2, 1);
+CREATE TABLE funcionamento (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    dia_semana ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'),
+    inicio TIME,
+    fim TIME,
+    aberto TINYINT,
+    capacidade INT
+);
 
 
 
--- -------------------- TRIGGERS -------------
 
-CREATE TRIGGER after_agendamento_insert
+CREATE TABLE horario_excecao (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    data_inicio DATE,
+    data_fim DATE,
+    inicio TIME,
+    fim TIME,
+    aberto TINYINT,
+    capacidade INT
+);
+
+CREATE TABLE avaliacao (
+    fk_agendamento INT PRIMARY KEY,
+    nota_servico INT,
+    descricao_servico VARCHAR(255),
+    data_horario DATETIME,
+    FOREIGN KEY (fk_agendamento) REFERENCES agendamento(id)
+);
+
+
+-- ----------------------------- TRIGGERS ------------------------
+
+-- Criação da trigger para histórico de agendamentos
+DELIMITER //
+CREATE TRIGGER trg_historico_agendamento
 AFTER INSERT ON agendamento
 FOR EACH ROW
-INSERT INTO historico_agendamento (fk_agendamento, fk_pagamento, fk_status, preco_final, data_horario)
-VALUES (NEW.id, NEW.fk_pagamento, NEW.fk_status, (SELECT preco FROM servico WHERE id = NEW.fk_servico), NOW());
+BEGIN
+    INSERT INTO historico_agendamento (data_horario, agendamento_id, agendamento_fk_servico, agendamento_fk_usuario, agendamento_fk_status)
+    VALUES (NOW(), NEW.id, NEW.fk_servico, NEW.fk_usuario, NEW.fk_status);
+END//
+DELIMITER ;
 
-
-DELIMITER $$
-
-CREATE TRIGGER after_agendamento_update
+DELIMITER //
+-- Criação da trigger para histórico de agendamentos após atualização
+CREATE TRIGGER trg_historico_agendamento_update
 AFTER UPDATE ON agendamento
 FOR EACH ROW
 BEGIN
-    IF OLD.fk_status <> NEW.fk_status THEN
-        INSERT INTO historico_agendamento 
-            (fk_agendamento, fk_pagamento, fk_status, preco_final, data_horario)
-        VALUES 
-            (NEW.id, NEW.fk_pagamento, NEW.fk_status, 
-             (SELECT preco FROM servico WHERE id = NEW.fk_servico), 
-             NOW());
-    END IF;
-END $$
-
+    INSERT INTO historico_agendamento (data_horario, agendamento_id, agendamento_fk_servico, agendamento_fk_usuario, agendamento_fk_status)
+    VALUES (NOW(), NEW.id, NEW.fk_servico, NEW.fk_usuario, NEW.fk_status);
+END//
 DELIMITER ;
 
 
 
--- ---------------------- SELECTS ---------------
+-- --------------- INSERTS -----------------
+
+INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade) VALUES
+('TUESDAY', '10:00:00', '19:00:00', 1, 2),
+('WEDNESDAY', '10:00:00', '19:00:00', 1, 2),
+('THURSDAY', '10:00:00', '19:00:00', 1, 2),
+('FRIDAY', '10:00:00', '19:00:00', 1, 2),
+('SATURDAY', '10:00:00', '19:00:00', 1, 2),
+('SUNDAY', NULL, NULL, 0, NULL),
+('MONDAY', NULL, NULL, 0, NULL);
 
 
-select * from agendamento;
+insert into status_agendamento (status) values ('AGENDADO'), ('CANCELADO'), ('CONCLUIDO - NÃO PAGO'), ('CONCLUIDO - PAGO');
 
+
+-- Inserção de tipos de usuário
+INSERT INTO tipo_usuario (descricao, tipo_usuariocol) VALUES ('Administrador', 'admin'), ('Cliente', 'cliente');
+
+-- Inserção de usuários (1 admin e 1 cliente)
+INSERT INTO usuario (fk_tipo_usuario, nome, telefone, CPF, email, senha) VALUES
+(1, 'Administrador do Salão', '11999999999', '000.000.000-00', 'admin@salao.com', 'admin123'),
+(2, 'Cliente Exemplo', '11888888888', '111.111.111-11', 'cliente@exemplo.com', 'cliente123');
+
+-- Inserção de serviços
+INSERT INTO servico (nome, preco, tempo, status, simultaneo) VALUES
+('Corte de Cabelo', 50.00, '00:30:00', 'Ativo', 0),
+('Manicure', 40.00, '00:45:00', 'Ativo', 1);
+
+
+insert into agendamento (fk_servico, fk_usuario, fk_status, data, inicio, fim, preco) values (1, 1, 1, '2025-04-10', '10:00:00', '11:00:00', '700');
+
+
+
+
+-- ------------------ TESTE TRIGGERS ----------------------
+
+update agendamento set fk_status = 2  where id = 1;
+
+
+-- -------------------- SELECTS --------------------------
 select * from historico_agendamento;
-
-
--- ---------------- TESTE TRIGER UPDATE --------------
-
-
-select * from agendamento;
-
-UPDATE agendamento SET fk_status = 2 WHERE id = 3;
