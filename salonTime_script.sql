@@ -83,7 +83,12 @@ CREATE TABLE funcionamento (
 );
 
 
-
+CREATE TABLE desc_funcionamento(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    descricao VARCHAR(200),
+    agendamento_id INT,
+    FOREIGN KEY (agendamento_id) REFERENCES agendamento(id)
+);
 
 CREATE TABLE horario_excecao (
     id INT PRIMARY KEY AUTO_INCREMENT,
