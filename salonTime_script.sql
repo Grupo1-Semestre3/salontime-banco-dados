@@ -18,8 +18,7 @@ CREATE TABLE info_salao (
 
 CREATE TABLE tipo_usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    descricao VARCHAR(100),
-    tipo_usuariocol VARCHAR(45)
+    descricao VARCHAR(100)
 );
 
 CREATE TABLE usuario (
@@ -83,7 +82,7 @@ CREATE TABLE funcionamento (
 );
 
 
-CREATE TABLE desc_funcionamento(
+CREATE TABLE desc_cancelamento(
 	id INT PRIMARY KEY AUTO_INCREMENT,
     descricao VARCHAR(200),
     agendamento_id INT,
