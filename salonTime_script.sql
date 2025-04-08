@@ -8,7 +8,7 @@ use salon_time;
 CREATE TABLE info_salao (
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255),
-    telefone VARCHAR(45),
+    telefone VARCHAR(11),
     logradouro VARCHAR(100),
     numero VARCHAR(10),
     cidade VARCHAR(45),
@@ -24,7 +24,7 @@ CREATE TABLE tipo_usuario (
 CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     fk_tipo_usuario INT,
-    nome VARCHAR(255),
+    nome VARCHAR(50),
     telefone CHAR(11),
     CPF CHAR(14),
     email VARCHAR(255),
@@ -34,7 +34,7 @@ CREATE TABLE usuario (
 
 CREATE TABLE servico (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(255),
+    nome VARCHAR(50),
     preco DECIMAL(10,2),
     tempo TIME,
     status VARCHAR(20),
@@ -69,7 +69,10 @@ CREATE TABLE historico_agendamento (
     agendamento_fk_servico INT,
     agendamento_fk_usuario INT,
     agendamento_fk_status INT,   
-    FOREIGN KEY (agendamento_id) REFERENCES agendamento(id)
+    FOREIGN KEY (agendamento_id) REFERENCES agendamento(id),
+    inicio time,
+    fim time,
+    preco decimal(10,2)
 );
 
 CREATE TABLE funcionamento (
@@ -110,27 +113,62 @@ CREATE TABLE avaliacao (
 
 -- ----------------------------- TRIGGERS ------------------------
 
--- Criação da trigger para histórico de agendamentos
 DELIMITER //
 CREATE TRIGGER trg_historico_agendamento
 AFTER INSERT ON agendamento
 FOR EACH ROW
 BEGIN
-    INSERT INTO historico_agendamento (data_horario, agendamento_id, agendamento_fk_servico, agendamento_fk_usuario, agendamento_fk_status)
-    VALUES (NOW(), NEW.id, NEW.fk_servico, NEW.fk_usuario, NEW.fk_status);
+    INSERT INTO historico_agendamento (
+        data_horario,
+        agendamento_id,
+        agendamento_fk_servico,
+        agendamento_fk_usuario,
+        agendamento_fk_status,
+        inicio,
+        fim,
+        preco
+    )
+    VALUES (
+        NOW(),
+        NEW.id,
+        NEW.fk_servico,
+        NEW.fk_usuario,
+        NEW.fk_status,
+        NEW.inicio,
+        NEW.fim,
+        NEW.preco
+    );
 END//
 DELIMITER ;
 
 DELIMITER //
--- Criação da trigger para histórico de agendamentos após atualização
 CREATE TRIGGER trg_historico_agendamento_update
 AFTER UPDATE ON agendamento
 FOR EACH ROW
 BEGIN
-    INSERT INTO historico_agendamento (data_horario, agendamento_id, agendamento_fk_servico, agendamento_fk_usuario, agendamento_fk_status)
-    VALUES (NOW(), NEW.id, NEW.fk_servico, NEW.fk_usuario, NEW.fk_status);
+    INSERT INTO historico_agendamento (
+        data_horario,
+        agendamento_id,
+        agendamento_fk_servico,
+        agendamento_fk_usuario,
+        agendamento_fk_status,
+        inicio,
+        fim,
+        preco
+    )
+    VALUES (
+        NOW(),
+        NEW.id,
+        NEW.fk_servico,
+        NEW.fk_usuario,
+        NEW.fk_status,
+        NEW.inicio,
+        NEW.fim,
+        NEW.preco
+    );
 END//
 DELIMITER ;
+
 
 
 
@@ -150,7 +188,7 @@ insert into status_agendamento (status) values ('AGENDADO'), ('CANCELADO'), ('CO
 
 
 -- Inserção de tipos de usuário
-INSERT INTO tipo_usuario (descricao, tipo_usuariocol) VALUES ('Administrador', 'admin'), ('Cliente', 'cliente');
+INSERT INTO tipo_usuario (descricao) VALUES ('Administrador'), ('Cliente');
 
 -- Inserção de usuários (1 admin e 1 cliente)
 INSERT INTO usuario (fk_tipo_usuario, nome, telefone, CPF, email, senha) VALUES
@@ -163,7 +201,7 @@ INSERT INTO servico (nome, preco, tempo, status, simultaneo) VALUES
 ('Manicure', 40.00, '00:45:00', 'Ativo', 1);
 
 
-insert into agendamento (fk_servico, fk_usuario, fk_status, data, inicio, fim, preco) values (1, 1, 1, '2025-04-10', '10:00:00', '11:00:00', '700');
+insert into agendamento (fk_servico, fk_usuario, fk_status, data, inicio, fim, preco) values (1, 1, 1, '2025-04-10', '10:00:00', '11:00:00', '800');
 
 
 
