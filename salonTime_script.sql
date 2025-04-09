@@ -18,7 +18,7 @@ CREATE TABLE info_salao (
 
 CREATE TABLE tipo_usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    descricao VARCHAR(100)
+    descricao varchar(45)
 );
 
 CREATE TABLE usuario (
@@ -28,7 +28,7 @@ CREATE TABLE usuario (
     telefone CHAR(11),
     CPF CHAR(14),
     email VARCHAR(255),
-    senha VARCHAR(255),
+    senha VARCHAR(30),
     FOREIGN KEY (fk_tipo_usuario) REFERENCES tipo_usuario(id)
 );
 
@@ -37,13 +37,13 @@ CREATE TABLE servico (
     nome VARCHAR(50),
     preco DECIMAL(10,2),
     tempo TIME,
-    status VARCHAR(20),
+    status enum("ATIVO", "INATIVO"),
     simultaneo TINYINT
 );
 
 CREATE TABLE status_agendamento (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    status varchar(45)
+    status enum("AGENDADO","CANCELADO","AUSENTE","PAGAMENTO_PENDENTE","CONCLUIDO")
 );
 
 CREATE TABLE agendamento (
@@ -184,8 +184,7 @@ INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade) VALUES
 ('MONDAY', NULL, NULL, 0, NULL);
 
 
-insert into status_agendamento (status) values ('AGENDADO'), ('CANCELADO'), ('CONCLUIDO - NÃO PAGO'), ('CONCLUIDO - PAGO');
-
+insert into status_agendamento (status) values ('AGENDADO'), ('CANCELADO'), ('AUSENTE'), ('PAGAMENTO_PENDENTE'),('CONCLUIDO');
 
 -- Inserção de tipos de usuário
 INSERT INTO tipo_usuario (descricao) VALUES ('Administrador'), ('Cliente');
@@ -197,11 +196,11 @@ INSERT INTO usuario (fk_tipo_usuario, nome, telefone, CPF, email, senha) VALUES
 
 -- Inserção de serviços
 INSERT INTO servico (nome, preco, tempo, status, simultaneo) VALUES
-('Corte de Cabelo', 50.00, '00:30:00', 'Ativo', 0),
-('Manicure', 40.00, '00:45:00', 'Ativo', 1);
+('Corte de Cabelo', 50.00, '00:30:00', 'ATIVO', 0),
+('Manicure', 40.00, '00:45:00', 'ATIVO', 1);
 
 
-insert into agendamento (fk_servico, fk_usuario, fk_status, data, inicio, fim, preco) values (1, 1, 1, '2025-04-10', '10:00:00', '11:00:00', '800');
+insert into agendamento (fk_servico, fk_usuario, fk_status, data, inicio, fim, preco) values (1, 1, 1, '2025-04-10', '10:00:00', '11:00:00', '1');
 
 
 
