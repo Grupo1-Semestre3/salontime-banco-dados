@@ -29,6 +29,7 @@ CREATE TABLE usuario (
     CPF CHAR(14),
     email VARCHAR(255),
     senha VARCHAR(30),
+    login tinyint,
     FOREIGN KEY (fk_tipo_usuario) REFERENCES tipo_usuario(id)
 );
 
@@ -190,9 +191,9 @@ insert into status_agendamento (status) values ('AGENDADO'), ('CANCELADO'), ('AU
 INSERT INTO tipo_usuario (descricao) VALUES ('Administrador'), ('Cliente');
 
 -- Inserção de usuários (1 admin e 1 cliente)
-INSERT INTO usuario (fk_tipo_usuario, nome, telefone, CPF, email, senha) VALUES
-(1, 'Administrador do Salão', '11999999999', '000.000.000-00', 'admin@salao.com', 'admin123'),
-(2, 'Cliente Exemplo', '11888888888', '111.111.111-11', 'cliente@exemplo.com', 'cliente123');
+INSERT INTO usuario (fk_tipo_usuario, nome, telefone, CPF, email, senha, login) VALUES
+(1, 'Administrador do Salão', '11999999999', '000.000.000-00', 'admin@salao.com', 'admin123', 0),
+(2, 'Cliente Exemplo', '11888888888', '111.111.111-11', 'cliente@exemplo.com', 'cliente123', 0);
 
 -- Inserção de serviços
 INSERT INTO servico (nome, preco, tempo, status, simultaneo) VALUES
