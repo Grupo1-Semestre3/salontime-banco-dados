@@ -39,7 +39,9 @@ CREATE TABLE servico (
     preco DECIMAL(10,2),
     tempo TIME,
     status enum("ATIVO", "INATIVO"),
-    simultaneo TINYINT
+    simultaneo TINYINT,
+    descricao varchar(255),
+    foto longblob
 );
 
 CREATE TABLE status_agendamento (
@@ -213,3 +215,14 @@ update agendamento set fk_status = 2  where id = 1;
 
 -- -------------------- SELECTS --------------------------
 select * from historico_agendamento;
+
+select * from agendamento;
+
+SELECT COUNT(*) > 0
+FROM agendamento
+WHERE data = '2025-04-10'
+  AND (
+    ('10:00:00' BETWEEN inicio AND fim)
+    OR ('11:00:00' BETWEEN inicio AND fim)
+    OR (inicio BETWEEN '10:00:00' AND '12:00:00')
+  );
