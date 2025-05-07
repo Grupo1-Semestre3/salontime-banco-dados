@@ -4,6 +4,8 @@ create database salon_time;
 
 use salon_time;
 
+show tables;
+
 -- Criação das tabelas
 CREATE TABLE info_salao (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -49,18 +51,26 @@ CREATE TABLE status_agendamento (
     status enum("AGENDADO","CANCELADO","AUSENTE","PAGAMENTO_PENDENTE","CONCLUIDO")
 );
 
+create table pagamento(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    forma varchar(50),
+    taxa decimal(10,2)
+);
+
 CREATE TABLE agendamento (
     id INT PRIMARY KEY AUTO_INCREMENT,
     fk_servico INT,
     fk_usuario INT,
     fk_status INT,
+    fk_pagamento INT,
     data DATE,
     inicio TIME,
     fim TIME,
     preco DECIMAL(10,2),
     FOREIGN KEY (fk_servico) REFERENCES servico(id),
     FOREIGN KEY (fk_status) REFERENCES status_agendamento(id),
-    FOREIGN KEY (fk_usuario) REFERENCES usuario(id)
+    FOREIGN KEY (fk_usuario) REFERENCES usuario(id),
+    FOREIGN KEY (fk_pagamento) REFERENCES pagamento(id)
 );
 
 
@@ -72,6 +82,7 @@ CREATE TABLE historico_agendamento (
     agendamento_fk_servico INT,
     agendamento_fk_usuario INT,
     agendamento_fk_status INT,   
+    agendamento_fk_pagamento INT,   
     FOREIGN KEY (agendamento_id) REFERENCES agendamento(id),
     inicio time,
     fim time,
@@ -127,6 +138,7 @@ BEGIN
         agendamento_fk_servico,
         agendamento_fk_usuario,
         agendamento_fk_status,
+        agendamento_fk_pagamento,
         inicio,
         fim,
         preco
@@ -137,6 +149,7 @@ BEGIN
         NEW.fk_servico,
         NEW.fk_usuario,
         NEW.fk_status,
+        NEW.fk_pagamento,
         NEW.inicio,
         NEW.fim,
         NEW.preco
@@ -155,6 +168,7 @@ BEGIN
         agendamento_fk_servico,
         agendamento_fk_usuario,
         agendamento_fk_status,
+        agendamento_fk_pagamento,
         inicio,
         fim,
         preco
@@ -165,6 +179,7 @@ BEGIN
         NEW.fk_servico,
         NEW.fk_usuario,
         NEW.fk_status,
+        NEW.fk_pagamento,
         NEW.inicio,
         NEW.fim,
         NEW.preco
@@ -202,6 +217,8 @@ INSERT INTO servico (nome, preco, tempo, status, simultaneo) VALUES
 ('Corte de Cabelo', 50.00, '00:30:00', 'ATIVO', 0),
 ('Manicure', 40.00, '00:45:00', 'ATIVO', 1);
 
+insert into pagamento (forma, taxa) values("Pix", 0);
+insert into pagamento (forma, taxa) values("Credito", 0);
 
 insert into agendamento (fk_servico, fk_usuario, fk_status, data, inicio, fim, preco) values (1, 1, 1, '2025-04-10', '10:00:00', '11:00:00', '1');
 
@@ -226,3 +243,5 @@ WHERE data = '2025-04-10'
     OR ('11:00:00' BETWEEN inicio AND fim)
     OR (inicio BETWEEN '10:00:00' AND '12:00:00')
   );
+  
+  select * from servico;
