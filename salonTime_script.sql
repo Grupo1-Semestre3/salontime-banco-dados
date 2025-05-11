@@ -32,6 +32,7 @@ CREATE TABLE usuario (
     email VARCHAR(255),
     senha VARCHAR(30),
     login tinyint,
+    foto longblob,
     FOREIGN KEY (fk_tipo_usuario) REFERENCES tipo_usuario(id)
 );
 
@@ -44,6 +45,14 @@ CREATE TABLE servico (
     simultaneo TINYINT,
     descricao varchar(255),
     foto longblob
+);
+
+CREATE TABLE usuario_servico_destinado(
+	usuario_id INT,
+    servico_id INT,
+    PRIMARY KEY (usuario_id, servico_id),
+    FOREIGN KEY (servico_id) REFERENCES servico(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
 CREATE TABLE status_agendamento (
@@ -59,6 +68,7 @@ create table pagamento(
 
 CREATE TABLE agendamento (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    funcionario_id INT,
     fk_servico INT,
     fk_usuario INT,
     fk_status INT,
@@ -67,6 +77,7 @@ CREATE TABLE agendamento (
     inicio TIME,
     fim TIME,
     preco DECIMAL(10,2),
+    FOREIGN KEY (funcionario_id) REFERENCES usuario(id),
     FOREIGN KEY (fk_servico) REFERENCES servico(id),
     FOREIGN KEY (fk_status) REFERENCES status_agendamento(id),
     FOREIGN KEY (fk_usuario) REFERENCES usuario(id),
@@ -205,43 +216,5 @@ INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade) VALUES
 insert into status_agendamento (status) values ('AGENDADO'), ('CANCELADO'), ('AUSENTE'), ('PAGAMENTO_PENDENTE'),('CONCLUIDO');
 
 -- Inserção de tipos de usuário
-INSERT INTO tipo_usuario (descricao) VALUES ('Administrador'), ('Cliente');
+INSERT INTO tipo_usuario (descricao) VALUES ('ADMINISTRADOR'), ('CLIENTE'), ('FUNCIONARIO');
 
--- Inserção de usuários (1 admin e 1 cliente)
-INSERT INTO usuario (fk_tipo_usuario, nome, telefone, CPF, email, senha, login) VALUES
-(1, 'Administrador do Salão', '11999999999', '000.000.000-00', 'admin@salao.com', 'admin123', 0),
-(2, 'Cliente Exemplo', '11888888888', '111.111.111-11', 'cliente@exemplo.com', 'cliente123', 0);
-
--- Inserção de serviços
-INSERT INTO servico (nome, preco, tempo, status, simultaneo) VALUES
-('Corte de Cabelo', 50.00, '00:30:00', 'ATIVO', 0),
-('Manicure', 40.00, '00:45:00', 'ATIVO', 1);
-
-insert into pagamento (forma, taxa) values("Pix", 0);
-insert into pagamento (forma, taxa) values("Credito", 0);
-
-insert into agendamento (fk_servico, fk_usuario, fk_status, data, inicio, fim, preco) values (1, 1, 1, '2025-04-10', '10:00:00', '11:00:00', '1');
-
-
-
-
--- ------------------ TESTE TRIGGERS ----------------------
-
-update agendamento set fk_status = 2  where id = 1;
-
-
--- -------------------- SELECTS --------------------------
-select * from historico_agendamento;
-
-select * from agendamento;
-
-SELECT COUNT(*) > 0
-FROM agendamento
-WHERE data = '2025-04-10'
-  AND (
-    ('10:00:00' BETWEEN inicio AND fim)
-    OR ('11:00:00' BETWEEN inicio AND fim)
-    OR (inicio BETWEEN '10:00:00' AND '12:00:00')
-  );
-  
-  select * from servico;
