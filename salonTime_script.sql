@@ -10,7 +10,7 @@ show tables;
 -- Criação das tabelas
 CREATE TABLE info_salao (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(255),
+    email VARCHAR(255),	
     telefone VARCHAR(11),
     logradouro VARCHAR(100),
     numero VARCHAR(10),
@@ -49,9 +49,9 @@ CREATE TABLE servico (
 );
 
 CREATE TABLE funcionario_competencia(
-	funcionario_id INT,
+	id INT primary key auto_increment,
+    funcionario_id INT,
     servico_id INT,
-    PRIMARY KEY (funcionario_id, servico_id),
     FOREIGN KEY (servico_id) REFERENCES servico(id),
     FOREIGN KEY (funcionario_id) REFERENCES usuario(id)
 );
@@ -294,4 +294,11 @@ VALUES (2, 3, 4, 2, 1, '2025-05-22', '16:00:00', '16:40:00', 40.00);
 INSERT INTO desc_cancelamento (descricao, agendamento_id)
 VALUES ('Cliente teve imprevisto no trabalho', 3);
 
-select * from avaliacao;	
+INSERT INTO info_salao (email, telefone, logradouro, numero, cidade, estado, complemento) 
+VALUES ('contato@salaoexemplo.com', '11987654321', 'Rua das Flores', '123', 'São Paulo', 'SP', 'Próximo ao metrô');
+
+select * from funcionario_competencia;
+
+update funcionario_competencia set funcionario_id = 1 where funcionario_id = 2;
+
+	
