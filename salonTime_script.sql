@@ -1,5 +1,6 @@
 create database salon_time;
 
+
 -- drop database salon_time;
 
 use salon_time;
@@ -25,7 +26,7 @@ CREATE TABLE tipo_usuario (
 
 CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    fk_tipo_usuario INT,
+    tipo_usuario_id INT,
     nome VARCHAR(50),
     telefone CHAR(11),
     CPF CHAR(14),
@@ -33,7 +34,7 @@ CREATE TABLE usuario (
     senha VARCHAR(30),
     login tinyint,
     foto longblob,
-    FOREIGN KEY (fk_tipo_usuario) REFERENCES tipo_usuario(id)
+    FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
 );
 
 CREATE TABLE servico (
@@ -47,12 +48,12 @@ CREATE TABLE servico (
     foto longblob
 );
 
-CREATE TABLE usuario_servico_destinado(
-	usuario_id INT,
+CREATE TABLE funcionario_competencia(
+	funcionario_id INT,
     servico_id INT,
-    PRIMARY KEY (usuario_id, servico_id),
+    PRIMARY KEY (funcionario_id, servico_id),
     FOREIGN KEY (servico_id) REFERENCES servico(id),
-    FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+    FOREIGN KEY (funcionario_id) REFERENCES usuario(id)
 );
 
 CREATE TABLE status_agendamento (
@@ -69,19 +70,19 @@ create table pagamento(
 CREATE TABLE agendamento (
     id INT PRIMARY KEY AUTO_INCREMENT,
     funcionario_id INT,
-    fk_servico INT,
-    fk_usuario INT,
-    fk_status INT,
-    fk_pagamento INT,
+    servico_id INT,
+    usuario_id INT,
+    status_agendamento_id INT,
+    pagamento_id INT,
     data DATE,
     inicio TIME,
     fim TIME,
     preco DECIMAL(10,2),
     FOREIGN KEY (funcionario_id) REFERENCES usuario(id),
-    FOREIGN KEY (fk_servico) REFERENCES servico(id),
-    FOREIGN KEY (fk_status) REFERENCES status_agendamento(id),
-    FOREIGN KEY (fk_usuario) REFERENCES usuario(id),
-    FOREIGN KEY (fk_pagamento) REFERENCES pagamento(id)
+    FOREIGN KEY (servico_id) REFERENCES servico(id),
+    FOREIGN KEY (status_agendamento_id) REFERENCES status_agendamento(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id),
+    FOREIGN KEY (pagamento_id) REFERENCES pagamento(id)
 );
 
 
@@ -90,10 +91,11 @@ CREATE TABLE historico_agendamento (
     id INT PRIMARY KEY AUTO_INCREMENT,
     data_horario DATETIME,
     agendamento_id INT,
-    agendamento_fk_servico INT,
-    agendamento_fk_usuario INT,
-    agendamento_fk_status INT,   
-    agendamento_fk_pagamento INT,   
+    agendamento_funcionario_id INT,
+    agendamento_servico_id INT,
+    agendamento_usuario_id INT,
+    agendamento_status_agendamento_id INT,   
+    agendamento_pagamento_id INT,   
     FOREIGN KEY (agendamento_id) REFERENCES agendamento(id),
     inicio time,
     fim time,
@@ -128,16 +130,19 @@ CREATE TABLE horario_excecao (
 );
 
 CREATE TABLE avaliacao (
-    fk_agendamento INT PRIMARY KEY,
+	id INT PRIMARY KEY auto_increment,
+    agendamento_id INT,
+    usuario_id INT,
     nota_servico INT,
     descricao_servico VARCHAR(255),
     data_horario DATETIME,
-    FOREIGN KEY (fk_agendamento) REFERENCES agendamento(id)
+    FOREIGN KEY (agendamento_id) REFERENCES agendamento(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
 
 -- ----------------------------- TRIGGERS ------------------------
-
+-- TRIGGERS corrigidas
 DELIMITER //
 CREATE TRIGGER trg_historico_agendamento
 AFTER INSERT ON agendamento
@@ -146,10 +151,11 @@ BEGIN
     INSERT INTO historico_agendamento (
         data_horario,
         agendamento_id,
-        agendamento_fk_servico,
-        agendamento_fk_usuario,
-        agendamento_fk_status,
-        agendamento_fk_pagamento,
+        agendamento_funcionario_id,
+        agendamento_servico_id,
+        agendamento_usuario_id,
+        agendamento_status_agendamento_id,
+        agendamento_pagamento_id,
         inicio,
         fim,
         preco
@@ -157,15 +163,17 @@ BEGIN
     VALUES (
         NOW(),
         NEW.id,
-        NEW.fk_servico,
-        NEW.fk_usuario,
-        NEW.fk_status,
-        NEW.fk_pagamento,
+        NEW.funcionario_id,
+        NEW.servico_id,
+        NEW.usuario_id,
+        NEW.status_agendamento_id,
+        NEW.pagamento_id,
         NEW.inicio,
         NEW.fim,
         NEW.preco
     );
-END//
+END;
+//
 DELIMITER ;
 
 DELIMITER //
@@ -176,10 +184,11 @@ BEGIN
     INSERT INTO historico_agendamento (
         data_horario,
         agendamento_id,
-        agendamento_fk_servico,
-        agendamento_fk_usuario,
-        agendamento_fk_status,
-        agendamento_fk_pagamento,
+        agendamento_funcionario_id,
+        agendamento_servico_id,
+        agendamento_usuario_id,
+        agendamento_status_agendamento_id,
+        agendamento_pagamento_id,
         inicio,
         fim,
         preco
@@ -187,21 +196,20 @@ BEGIN
     VALUES (
         NOW(),
         NEW.id,
-        NEW.fk_servico,
-        NEW.fk_usuario,
-        NEW.fk_status,
-        NEW.fk_pagamento,
+        NEW.funcionario_id,
+        NEW.servico_id,
+        NEW.usuario_id,
+        NEW.status_agendamento_id,
+        NEW.pagamento_id,
         NEW.inicio,
         NEW.fim,
         NEW.preco
     );
-END//
+END;
+//
 DELIMITER ;
 
-
-
-
--- --------------- INSERTS -----------------
+-- DADOS INICIAIS
 
 INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade) VALUES
 ('TUESDAY', '10:00:00', '19:00:00', 1, 2),
@@ -212,9 +220,78 @@ INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade) VALUES
 ('SUNDAY', NULL, NULL, 0, NULL),
 ('MONDAY', NULL, NULL, 0, NULL);
 
+INSERT INTO status_agendamento (status) VALUES 
+('AGENDADO'), 
+('CANCELADO'), 
+('AUSENTE'), 
+('PAGAMENTO_PENDENTE'),
+('CONCLUIDO');
 
-insert into status_agendamento (status) values ('AGENDADO'), ('CANCELADO'), ('AUSENTE'), ('PAGAMENTO_PENDENTE'),('CONCLUIDO');
+INSERT INTO tipo_usuario (descricao) VALUES 
+('ADMINISTRADOR'), 
+('CLIENTE'), 
+('FUNCIONARIO');
 
--- Inserção de tipos de usuário
-INSERT INTO tipo_usuario (descricao) VALUES ('ADMINISTRADOR'), ('CLIENTE'), ('FUNCIONARIO');
+-- ADMIN
+INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto)
+VALUES (1, 'Admin Master', '11999999999', '00000000000', 'admin@salontime.com', 'admin123', 1, NULL);
 
+-- FUNCIONÁRIOS
+INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto)
+VALUES 
+(3, 'Joana Souza', '11988887777', '12345678900', 'joana@salontime.com', 'joana123', 0, NULL),
+(3, 'Carlos Mendes', '11977776666', '23456789001', 'carlos@salontime.com', 'carlos123', 0, NULL);
+
+-- CLIENTES
+INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto)
+VALUES 
+(2, 'Maria Clara', '11966665555', '34567890123', 'maria@cliente.com', 'maria123', 0, NULL),
+(2, 'Lucas Lima', '11955554444', '45678901234', 'lucas@cliente.com', 'lucas123', 0, NULL);
+
+INSERT INTO servico (nome, preco, tempo, status, simultaneo, descricao, foto)
+VALUES 
+('Corte Feminino', 70.00, '00:45:00', 'ATIVO', 1, 'Corte feminino completo', NULL),
+('Corte Masculino', 50.00, '00:30:00', 'ATIVO', 1, 'Corte masculino tradicional', NULL),
+('Manicure', 40.00, '00:40:00', 'ATIVO', 0, 'Serviço de manicure', NULL);
+
+INSERT INTO pagamento (forma, taxa)
+VALUES 
+('Dinheiro', 0.00),
+('Cartão de Crédito', 3.50),
+('Pix', 0.00);
+
+-- Joana faz Corte Feminino e Manicure
+INSERT INTO funcionario_competencia (funcionario_id, servico_id)
+VALUES 
+(2, 1), 
+(2, 3);
+
+-- Carlos faz Corte Masculino
+INSERT INTO funcionario_competencia (funcionario_id, servico_id)
+VALUES 
+(3, 2);
+
+
+-- Maria Clara agendou Corte Feminino com Joana
+INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
+VALUES (2, 1, 4, 1, 1, '2025-05-20', '14:00:00', '14:45:00', 70.00);
+
+-- Lucas Lima agendou Corte Masculino com Carlos
+INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
+VALUES (3, 2, 5, 1, 2, '2025-05-21', '15:00:00', '15:30:00', 50.00);
+
+
+INSERT INTO avaliacao (agendamento_id, usuario_id, nota_servico, descricao_servico, data_horario)
+VALUES 
+(1, 4, 5, 'Excelente atendimento e corte impecável!', NOW()),
+(2, 5, 4, 'Bom serviço, mas poderia ser mais rápido.', NOW());
+
+
+-- Simulando cancelamento futuro
+INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
+VALUES (2, 3, 4, 2, 1, '2025-05-22', '16:00:00', '16:40:00', 40.00);
+
+INSERT INTO desc_cancelamento (descricao, agendamento_id)
+VALUES ('Cliente teve imprevisto no trabalho', 3);
+
+select * from avaliacao;	
