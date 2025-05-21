@@ -34,6 +34,8 @@ CREATE TABLE usuario (
     senha VARCHAR(30),
     login tinyint,
     foto longblob,
+    data_nascimento Date not null,
+    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
 );
 
@@ -233,20 +235,22 @@ INSERT INTO tipo_usuario (descricao) VALUES
 ('FUNCIONARIO');
 
 -- ADMIN
-INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto)
-VALUES (1, 'Admin Master', '11999999999', '00000000000', 'admin@salontime.com', 'admin123', 1, NULL);
+INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto, data_nascimento) 
+VALUES 
+(1, 'Admin Master', '11999999999', '00000000000', 'admin@salontime.com', 'admin123', 1, NULL, '1980-01-01');
 
 -- FUNCIONÁRIOS
-INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto)
-VALUES 
-(3, 'Joana Souza', '11988887777', '12345678900', 'joana@salontime.com', 'joana123', 0, NULL),
-(3, 'Carlos Mendes', '11977776666', '23456789001', 'carlos@salontime.com', 'carlos123', 0, NULL);
+INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto, data_nascimento) 
+VALUES  
+(3, 'Joana Souza', '11988887777', '12345678900', 'joana@salontime.com', 'joana123', 0, NULL, '1990-05-15'),
+(3, 'Carlos Mendes', '11977776666', '23456789001', 'carlos@salontime.com', 'carlos123', 0, NULL, '1985-09-30');
 
 -- CLIENTES
-INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto)
-VALUES 
-(2, 'Maria Clara', '11966665555', '34567890123', 'maria@cliente.com', 'maria123', 0, NULL),
-(2, 'Lucas Lima', '11955554444', '45678901234', 'lucas@cliente.com', 'lucas123', 0, NULL);
+INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto, data_nascimento) 
+VALUES  
+(2, 'Maria Clara', '11966665555', '34567890123', 'maria@cliente.com', 'maria123', 0, NULL, '1995-12-20'),
+(2, 'Lucas Lima', '11955554444', '45678901234', 'lucas@cliente.com', 'lucas123', 0, NULL, '2000-03-10');
+
 
 INSERT INTO servico (nome, preco, tempo, status, simultaneo, descricao, foto)
 VALUES 
@@ -280,6 +284,9 @@ VALUES (2, 1, 4, 1, 1, '2025-05-20', '14:00:00', '14:45:00', 70.00);
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
 VALUES (3, 2, 5, 1, 2, '2025-05-21', '15:00:00', '15:30:00', 50.00);
 
+-- Lucas Lima agendou Corte Masculino com Carlos
+INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
+VALUES (3, 2, 5, 1, 2, '2025-05-21', '15:00:00', '15:30:00', 50.00);
 
 INSERT INTO avaliacao (agendamento_id, usuario_id, nota_servico, descricao_servico, data_horario)
 VALUES 
@@ -300,5 +307,24 @@ VALUES ('contato@salaoexemplo.com', '11987654321', 'Rua das Flores', '123', 'Sã
 select * from funcionario_competencia;
 
 update funcionario_competencia set funcionario_id = 1 where funcionario_id = 2;
+
+
+
+SELECT 
+    s.id AS servico_id,
+    s.nome AS nome_servico,
+    AVG(a.nota_servico) AS media_nota
+FROM 
+    servico s
+JOIN 
+    agendamento ag ON s.id = ag.servico_id
+JOIN 
+    avaliacao a ON ag.id = a.agendamento_id
+GROUP BY 
+    s.id, s.nome;
+    
+    
+select * from servico;
+
 
 	
