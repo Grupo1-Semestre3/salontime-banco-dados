@@ -276,6 +276,10 @@ VALUES
 (3, 2);
 
 
+INSERT INTO funcionario_competencia (funcionario_id, servico_id)
+VALUES 
+(2, 2);
+
 -- Maria Clara agendou Corte Feminino com Joana
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
 VALUES (2, 1, 4, 1, 1, '2025-05-20', '14:00:00', '14:45:00', 70.00);
@@ -286,7 +290,7 @@ VALUES (3, 2, 5, 1, 2, '2025-05-21', '15:00:00', '15:30:00', 50.00);
 
 -- Lucas Lima agendou Corte Masculino com Carlos
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
-VALUES (3, 2, 5, 1, 2, '2025-05-21', '15:00:00', '15:30:00', 50.00);
+VALUES (3, 2, 4, 1, 2, '2025-05-27', '15:00:00', '15:30:00', 50.00);
 
 INSERT INTO avaliacao (agendamento_id, usuario_id, nota_servico, descricao_servico, data_horario)
 VALUES 
@@ -296,7 +300,7 @@ VALUES
 
 -- Simulando cancelamento futuro
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
-VALUES (2, 3, 4, 2, 1, '2025-05-22', '16:00:00', '16:40:00', 40.00);
+VALUES (2, 3, 4, 2, 1, '2025-05-26', '16:00:00', '16:40:00', 40.00);
 
 INSERT INTO desc_cancelamento (descricao, agendamento_id)
 VALUES ('Cliente teve imprevisto no trabalho', 3);
@@ -311,20 +315,31 @@ update funcionario_competencia set funcionario_id = 1 where funcionario_id = 2;
 
 
 SELECT 
-    s.id AS servico_id,
-    s.nome AS nome_servico,
+    s.id,
+    s.nome,
+    s.preco,
+    s.tempo,
+    s.status,
+    s.simultaneo,
+    s.descricao,
+    s.foto,
     AVG(a.nota_servico) AS media_nota
 FROM 
     servico s
-JOIN 
+LEFT JOIN 
     agendamento ag ON s.id = ag.servico_id
-JOIN 
+LEFT JOIN 
     avaliacao a ON ag.id = a.agendamento_id
+WHERE 
+    s.status = 'ATIVO'
 GROUP BY 
-    s.id, s.nome;
-    
-    
-select * from servico;
+    s.id, s.nome, s.preco, s.tempo, s.status, s.simultaneo, s.descricao, s.foto;
 
 
-	
+    
+    
+select * from agendamento;
+
+SELECT * FROM agendamento WHERE (data < CURDATE() AND usuario_id = 4) OR (data = CURDATE() AND inicio < CURTIME()) ORDER BY data ASC, inicio ASC;	
+
+SELECT * FROM agendamento WHERE (data > CURDATE() AND funcionario_id = 3) OR (data = CURDATE() AND inicio > CURTIME()) ORDER BY data ASC, inicio ASC
