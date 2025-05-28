@@ -34,7 +34,7 @@ CREATE TABLE usuario (
     senha VARCHAR(30),
     login tinyint,
     foto longblob,
-    data_nascimento Date not null,
+    data_nascimento Date,
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
 );
@@ -131,6 +131,12 @@ CREATE TABLE horario_excecao (
     capacidade INT
 );
 
+CREATE TABLE cupom_configurado (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    intervalo_atendimento INT,
+    porcentagem_desconto INT
+);
+
 CREATE TABLE avaliacao (
 	id INT PRIMARY KEY auto_increment,
     agendamento_id INT,
@@ -141,6 +147,27 @@ CREATE TABLE avaliacao (
     FOREIGN KEY (agendamento_id) REFERENCES agendamento(id),
     FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
+
+CREATE TABLE cupom (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(45),
+    descricao VARCHAR(45),
+    codigo VARCHAR(45),
+    ativo TINYINT,
+    inicio DATE,
+    fim DATE,
+    tipo_destinatario VARCHAR(45)
+);
+
+CREATE TABLE cupom_destinado (
+    id INT PRIMARY KEY auto_increment,
+    cupom_id INT,
+    usuario_id INT,
+    usado TINYINT,
+    FOREIGN KEY (cupom_id) REFERENCES cupom(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+);
+
 
 
 -- ----------------------------- TRIGGERS ------------------------
@@ -313,6 +340,33 @@ select * from funcionario_competencia;
 update funcionario_competencia set funcionario_id = 1 where funcionario_id = 2;
 
 
+INSERT INTO cupom (nome, descricao, codigo, ativo, inicio, fim, tipo_destinatario)
+VALUES 
+('Desconto Black Friday', 'Desconto de 30% na Black Friday', 'BLACK30', 1, '2025-11-25', '2025-11-30', 'clientes');
+
+INSERT INTO cupom (nome, descricao, codigo, ativo, inicio, fim, tipo_destinatario)
+VALUES 
+('Frete Grátis', 'Frete grátis para compras acima de R$100', 'FRETEGRATIS', 1, '2025-05-01', '2025-06-01', 'todos');
+
+INSERT INTO cupom (nome, descricao, codigo, ativo, inicio, fim, tipo_destinatario)
+VALUES 
+('Desconto Aniversário', '20% para aniversariantes do mês', 'ANIV20', 1, '2025-01-01', '2025-12-31', 'clientes');
+
+INSERT INTO cupom (nome, descricao, codigo, ativo, inicio, fim, tipo_destinatario)
+VALUES 
+('Desconto Funcionários', '50% exclusivo para funcionários', 'FUNC50', 1, '2025-01-01', '2025-12-31', 'funcionarios');
+
+INSERT INTO cupom (nome, descricao, codigo, ativo, inicio, fim, tipo_destinatario)
+VALUES 
+('Promoção Verão', '10% em toda loja no verão', 'VERAO10', 0, '2025-12-01', '2026-02-28', 'todos');
+
+INSERT INTO cupom_destinado (cupom_id, usuario_id, usado) 
+VALUES 
+(1, 1, 0),
+(2, 2, 1),
+(3, 2, 0);
+
+INSERT INTO cupom_configurado (intervalo_atendimento, porcentagem_desconto) VALUES (10, 10);
 
 SELECT 
     s.id,
@@ -337,8 +391,11 @@ GROUP BY
 
 
     
-    
+    SELECT * FROM agendamento WHERE status_agendamento_id = 2 ORDER BY data ASC, inicio ASC;
 select * from agendamento;
+
+
+select * from usuario;
 
 SELECT * FROM agendamento WHERE (data < CURDATE() AND usuario_id = 4) OR (data = CURDATE() AND inicio < CURTIME()) ORDER BY data ASC, inicio ASC;	
 
