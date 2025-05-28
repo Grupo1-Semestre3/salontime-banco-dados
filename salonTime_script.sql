@@ -131,7 +131,7 @@ CREATE TABLE horario_excecao (
     capacidade INT
 );
 
-CREATE TABLE cupom_configurado (
+CREATE TABLE cupom_configuracao (
     id INT PRIMARY KEY AUTO_INCREMENT,
     intervalo_atendimento INT,
     porcentagem_desconto INT
@@ -366,7 +366,7 @@ VALUES
 (2, 2, 1),
 (3, 2, 0);
 
-INSERT INTO cupom_configurado (intervalo_atendimento, porcentagem_desconto) VALUES (10, 10);
+INSERT INTO cupom_configuracao (intervalo_atendimento, porcentagem_desconto) VALUES (10, 10);
 
 SELECT 
     s.id,
