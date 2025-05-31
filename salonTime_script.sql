@@ -102,7 +102,7 @@ CREATE TABLE historico_agendamento (
     inicio time,
     fim time,
     preco decimal(10,2)
-);
+);	
 
 CREATE TABLE funcionamento (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -436,5 +436,111 @@ WHERE
     a.data = '2025-05-20';
 
 
-  
+-- -------------------------- VIEW ----------------------------
+
+
+-- KPIS DE ATENDIMENTOS, FATURAMENTO E ATENDIMENTOS CANCELADOS
+
+ CREATE VIEW vw_agendamentos_mensal AS
+SELECT 
+    YEAR(data_horario) AS ano,
+    MONTH(data_horario) AS mes,
+    COUNT(*) AS total_agendamentos,
+    SUM(preco) AS faturamento_total,
+    SUM(CASE WHEN agendamento_status_agendamento_id = 2 THEN 1 ELSE 0 END) AS total_cancelados
+FROM 
+    historico_agendamento
+GROUP BY 
+    YEAR(data_horario),
+    MONTH(data_horario)
+ORDER BY
+    ano,
+    mes;
+    
+select * from vw_agendamentos_mensal;
+
+
+-- KPI DE USUARIO CADASTRADOS
+
+CREATE VIEW vw_cadastros_mensais_usuarios AS
+SELECT 
+    YEAR(data_criacao) AS ano,
+    MONTH(data_criacao) AS mes,
+    COUNT(*) AS total_cadastros
+FROM 
+    usuario
+GROUP BY 
+    YEAR(data_criacao),
+    MONTH(data_criacao)
+ORDER BY 
+    ano,
+    mes;
+    
+select * from  vw_cadastros_mensais_usuarios;
+
+
+
+-- GRÁFICO QTD ATENDIMENTO POR MES
+
+CREATE TABLE calendario_2025 (
+  dia DATE PRIMARY KEY
+);
+
+-- Inserindo de 2025-01-01 até 2025-12-31
+INSERT INTO calendario_2025 (dia)
+SELECT DATE('2025-01-01') + INTERVAL seq DAY
+FROM (
+  SELECT a + b * 10 AS seq
+  FROM (
+    SELECT 0 a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
+  ) AS unidades,
+  (
+    SELECT 0 b UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
+    UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 UNION ALL SELECT 13 UNION ALL SELECT 14
+    UNION ALL SELECT 15 UNION ALL SELECT 16 UNION ALL SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19
+    UNION ALL SELECT 20 UNION ALL SELECT 21 UNION ALL SELECT 22 UNION ALL SELECT 23 UNION ALL SELECT 24
+    UNION ALL SELECT 25 UNION ALL SELECT 26 UNION ALL SELECT 27 UNION ALL SELECT 28 UNION ALL SELECT 29
+    UNION ALL SELECT 30 UNION ALL SELECT 31 UNION ALL SELECT 32 UNION ALL SELECT 33 UNION ALL SELECT 34
+    UNION ALL SELECT 35
+  ) AS dezenas
+  WHERE a + b * 10 <= 364
+) AS dias;
+
+CREATE VIEW atendimentos_por_dia AS
+SELECT 
+  c.dia,
+  COUNT(h.id) AS total_atendimentos
+FROM calendario_2025 c
+LEFT JOIN historico_agendamento h
+  ON DATE(h.data_horario) = c.dia
+GROUP BY c.dia
+ORDER BY c.dia;
+
+SELECT * FROM atendimentos_por_dia;
+
+-- GRÁFICO DE ATENDIMENTO POR SERVIÇO
+
+CREATE VIEW view_atendimentos_por_servico_mes AS
+SELECT
+    DATE_FORMAT(h.data_horario, '%Y-%m') AS mes,
+    s.id AS servico_id,
+    s.nome AS nome_servico,
+    COUNT(*) AS quantidade_atendimentos
+FROM
+    historico_agendamento h
+JOIN
+    servico s ON h.agendamento_servico_id = s.id
+WHERE
+    s.status = 'ATIVO'
+GROUP BY
+    DATE_FORMAT(h.data_horario, '%Y-%m'),
+    s.id,
+    s.nome
+ORDER BY
+    mes, nome_servico;
+    
+    select * from view_atendimentos_por_servico_mes;
+
 
