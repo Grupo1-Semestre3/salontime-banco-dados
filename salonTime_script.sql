@@ -110,7 +110,9 @@ CREATE TABLE funcionamento (
     inicio TIME,
     fim TIME,
     aberto TINYINT,
-    capacidade INT
+    capacidade INT,
+    funcionario_id INT,
+    FOREIGN KEY (funcionario_id) REFERENCES usuario(id)
 );
 
 
@@ -128,7 +130,9 @@ CREATE TABLE horario_excecao (
     inicio TIME,
     fim TIME,
     aberto TINYINT,
-    capacidade INT
+    capacidade INT,
+	funcionario_id INT,
+    FOREIGN KEY (funcionario_id) REFERENCES usuario(id)
 );
 
 CREATE TABLE cupom_configuracao (
@@ -240,14 +244,6 @@ DELIMITER ;
 
 -- DADOS INICIAIS
 
-INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade) VALUES
-('TUESDAY', '10:00:00', '19:00:00', 1, 2),
-('WEDNESDAY', '10:00:00', '19:00:00', 1, 2),
-('THURSDAY', '10:00:00', '19:00:00', 1, 2),
-('FRIDAY', '10:00:00', '19:00:00', 1, 2),
-('SATURDAY', '10:00:00', '19:00:00', 1, 2),
-('SUNDAY', NULL, NULL, 0, NULL),
-('MONDAY', NULL, NULL, 0, NULL);
 
 INSERT INTO status_agendamento (status) VALUES 
 ('AGENDADO'), 
@@ -278,6 +274,23 @@ VALUES
 (2, 'Maria Clara', '11966665555', '34567890123', 'maria@cliente.com', 'maria123', 0, NULL, '1995-12-20'),
 (2, 'Lucas Lima', '11955554444', '45678901234', 'lucas@cliente.com', 'lucas123', 0, NULL, '2000-03-10');
 
+INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funcionario_id) VALUES
+('TUESDAY', '10:00:00', '19:00:00', 1, 1, 1),
+('WEDNESDAY', '10:00:00', '19:00:00', 1, 1, 1),
+('THURSDAY', '10:00:00', '19:00:00', 1, 1, 1),
+('FRIDAY', '10:00:00', '19:00:00', 1, 1, 1),
+('SATURDAY', '10:00:00', '19:00:00', 1, 1, 1),
+('SUNDAY', NULL, NULL, 0, NULL, 1),
+('MONDAY', NULL, NULL, 0, NULL, 1);
+
+INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funcionario_id) VALUES
+('TUESDAY', '10:00:00', '19:00:00', 1, 2, 2),
+('WEDNESDAY', '10:00:00', '19:00:00', 1, 2, 2),
+('THURSDAY', '10:00:00', '19:00:00', 1, 2, 2),
+('FRIDAY', '10:00:00', '19:00:00', 1, 2, 2),
+('SATURDAY', '10:00:00', '19:00:00', 1, 2, 2),
+('SUNDAY', NULL, NULL, 0, NULL, 1),
+('MONDAY', NULL, NULL, 0, NULL, 1);
 
 INSERT INTO servico (nome, preco, tempo, status, simultaneo, descricao, foto)
 VALUES 
@@ -310,6 +323,11 @@ VALUES
 -- Maria Clara agendou Corte Feminino com Joana
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
 VALUES (2, 1, 4, 1, 1, '2025-05-20', '14:00:00', '14:45:00', 70.00);
+
+-- Maria Clara agendou Corte Feminino com Joana
+INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
+VALUES (1, 1, 4, 1, 1, '2025-05-20', '10:00:00', '11:00:00', 70.00);
+
 
 -- Lucas Lima agendou Corte Masculino com Carlos
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
@@ -399,4 +417,24 @@ select * from usuario;
 
 SELECT * FROM agendamento WHERE (data < CURDATE() AND usuario_id = 4) OR (data = CURDATE() AND inicio < CURTIME()) ORDER BY data ASC, inicio ASC;	
 
-SELECT * FROM agendamento WHERE (data > CURDATE() AND funcionario_id = 3) OR (data = CURDATE() AND inicio > CURTIME()) ORDER BY data ASC, inicio ASC
+select * from agendamento;
+
+SELECT inicio, fim
+FROM agendamento
+WHERE data = '2025-05-20';
+
+SELECT 
+    a.inicio, 
+    a.fim,
+    (SELECT f.capacidade 
+     FROM funcionamento f 
+     WHERE f.funcionario_id = a.funcionario_id 
+     LIMIT 1) AS capacidade
+FROM 
+    agendamento a
+WHERE 
+    a.data = '2025-05-20';
+
+
+  
+
