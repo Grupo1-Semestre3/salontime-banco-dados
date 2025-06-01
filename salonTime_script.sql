@@ -19,6 +19,17 @@ CREATE TABLE info_salao (
     complemento VARCHAR(45)
 );
 
+CREATE TABLE cupom (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(45),
+    descricao VARCHAR(45),
+    codigo VARCHAR(45),
+    ativo TINYINT,
+    inicio DATE,
+    fim DATE,
+    tipo_destinatario VARCHAR(45)
+);
+
 CREATE TABLE tipo_usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     descricao varchar(45)
@@ -74,6 +85,7 @@ CREATE TABLE agendamento (
     funcionario_id INT,
     servico_id INT,
     usuario_id INT,
+    cupom_id INT,
     status_agendamento_id INT,
     pagamento_id INT,
     data DATE,
@@ -81,6 +93,7 @@ CREATE TABLE agendamento (
     fim TIME,
     preco DECIMAL(10,2),
     FOREIGN KEY (funcionario_id) REFERENCES usuario(id),
+    FOREIGN KEY (cupom_id) REFERENCES cupom(id),
     FOREIGN KEY (servico_id) REFERENCES servico(id),
     FOREIGN KEY (status_agendamento_id) REFERENCES status_agendamento(id),
     FOREIGN KEY (usuario_id) REFERENCES usuario(id),
@@ -152,16 +165,6 @@ CREATE TABLE avaliacao (
     FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
-CREATE TABLE cupom (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(45),
-    descricao VARCHAR(45),
-    codigo VARCHAR(45),
-    ativo TINYINT,
-    inicio DATE,
-    fim DATE,
-    tipo_destinatario VARCHAR(45)
-);
 
 CREATE TABLE cupom_destinado (
     id INT PRIMARY KEY auto_increment,
