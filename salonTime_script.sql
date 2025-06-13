@@ -1,9 +1,10 @@
 create database salon_time;
 
-
 -- drop database salon_time;
 
 use salon_time;
+
+	select * from usuario;
 
 show tables;
 
@@ -47,6 +48,7 @@ CREATE TABLE usuario (
     foto longblob,
     data_nascimento Date,
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ativo tinyint default true,
     FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
 );
 
@@ -389,6 +391,8 @@ VALUES
 
 INSERT INTO cupom_configuracao (intervalo_atendimento, porcentagem_desconto) VALUES (10, 10);
 
+select * from  agendamento;
+
 SELECT 
     s.id,
     s.nome,
@@ -546,4 +550,5 @@ ORDER BY
     
     select * from view_atendimentos_por_servico_mes;
 
-
+SELECT * FROM agendamento WHERE ((data > CURDATE()) OR (data = CURDATE() AND inicio > CURTIME())) AND usuario_id = 2 ORDER BY data ASC, inicio ASC LIMIT 1;
+SELECT * FROM desc_cancelamento;
