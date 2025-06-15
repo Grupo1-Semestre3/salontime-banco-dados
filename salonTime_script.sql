@@ -4,8 +4,6 @@ create database salon_time;
 
 use salon_time;
 
-	select * from usuario;
-
 show tables;
 
 -- Criação das tabelas
@@ -113,6 +111,7 @@ CREATE TABLE historico_agendamento (
     agendamento_usuario_id INT,
     agendamento_status_agendamento_id INT,   
     agendamento_pagamento_id INT,   
+    taxa_utilizada DECIMAL(5,2),
     FOREIGN KEY (agendamento_id) REFERENCES agendamento(id),
     inicio time,
     fim time,
@@ -177,6 +176,17 @@ CREATE TABLE cupom_destinado (
     FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
+CREATE TABLE copum_configuracao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    intervalo_atendimento INT,
+    porcentagem_desconto INT
+);
+
+
+INSERT INTO copum_configuracao (intervalo_atendimento, porcentagem_desconto)
+VALUES (10, 10);
+
+
 
 
 -- ----------------------------- TRIGGERS ------------------------
@@ -186,6 +196,12 @@ CREATE TRIGGER trg_historico_agendamento
 AFTER INSERT ON agendamento
 FOR EACH ROW
 BEGIN
+    DECLARE v_taxa DECIMAL(5,2);
+
+    SELECT taxa INTO v_taxa
+    FROM pagamento
+    WHERE id = NEW.pagamento_id;
+
     INSERT INTO historico_agendamento (
         data_horario,
         agendamento_id,
@@ -196,7 +212,8 @@ BEGIN
         agendamento_pagamento_id,
         inicio,
         fim,
-        preco
+        preco,
+        taxa_utilizada
     )
     VALUES (
         NOW(),
@@ -208,7 +225,8 @@ BEGIN
         NEW.pagamento_id,
         NEW.inicio,
         NEW.fim,
-        NEW.preco
+        NEW.preco,
+        v_taxa
     );
 END;
 //
@@ -219,6 +237,12 @@ CREATE TRIGGER trg_historico_agendamento_update
 AFTER UPDATE ON agendamento
 FOR EACH ROW
 BEGIN
+    DECLARE v_taxa DECIMAL(5,2);
+
+    SELECT taxa INTO v_taxa
+    FROM pagamento
+    WHERE id = NEW.pagamento_id;
+
     INSERT INTO historico_agendamento (
         data_horario,
         agendamento_id,
@@ -229,7 +253,8 @@ BEGIN
         agendamento_pagamento_id,
         inicio,
         fim,
-        preco
+        preco,
+        taxa_utilizada
     )
     VALUES (
         NOW(),
@@ -241,11 +266,13 @@ BEGIN
         NEW.pagamento_id,
         NEW.inicio,
         NEW.fim,
-        NEW.preco
+        NEW.preco,
+        v_taxa
     );
 END;
 //
 DELIMITER ;
+
 
 -- DADOS INICIAIS
 
@@ -341,6 +368,8 @@ VALUES (3, 2, 5, 1, 2, '2025-05-21', '15:00:00', '15:30:00', 50.00);
 -- Lucas Lima agendou Corte Masculino com Carlos
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
 VALUES (3, 2, 4, 1, 2, '2025-05-27', '15:00:00', '15:30:00', 50.00);
+
+update agendamento set status_agendamento_id = 2 where id =3;
 
 INSERT INTO avaliacao (agendamento_id, usuario_id, nota_servico, descricao_servico, data_horario)
 VALUES 
@@ -448,7 +477,7 @@ WHERE
 
 -- KPIS DE ATENDIMENTOS, FATURAMENTO E ATENDIMENTOS CANCELADOS
 
- CREATE VIEW vw_agendamentos_mensal AS
+CREATE VIEW vw_agendamentos_mensal AS
 SELECT 
     YEAR(data_horario) AS ano,
     MONTH(data_horario) AS mes,
@@ -551,4 +580,4 @@ ORDER BY
     select * from view_atendimentos_por_servico_mes;
 
 SELECT * FROM agendamento WHERE ((data > CURDATE()) OR (data = CURDATE() AND inicio > CURTIME())) AND usuario_id = 2 ORDER BY data ASC, inicio ASC LIMIT 1;
-SELECT * FROM desc_cancelamento;
+SELECT * FROM historico_agendamento;
