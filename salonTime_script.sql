@@ -315,20 +315,12 @@ INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funciona
 ('SUNDAY', NULL, NULL, 0, NULL, 1),
 ('MONDAY', NULL, NULL, 0, NULL, 1);
 
-INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funcionario_id) VALUES
-('TUESDAY', '10:00:00', '19:00:00', 1, 2, 2),
-('WEDNESDAY', '10:00:00', '19:00:00', 1, 2, 2),
-('THURSDAY', '10:00:00', '19:00:00', 1, 2, 2),
-('FRIDAY', '10:00:00', '19:00:00', 1, 2, 2),
-('SATURDAY', '10:00:00', '19:00:00', 1, 2, 2),
-('SUNDAY', NULL, NULL, 0, NULL, 1),
-('MONDAY', NULL, NULL, 0, NULL, 1);
-
 INSERT INTO servico (nome, preco, tempo, status, simultaneo, descricao, foto)
 VALUES 
 ('Corte Feminino', 70.00, '00:45:00', 'ATIVO', 1, 'Corte feminino completo', NULL),
 ('Corte Masculino', 50.00, '00:30:00', 'ATIVO', 1, 'Corte masculino tradicional', NULL),
-('Manicure', 40.00, '00:40:00', 'ATIVO', 0, 'Serviço de manicure', NULL);
+('Manicure', 40.00, '00:40:00', 'ATIVO', 0, 'Serviço de manicure', NULL),
+('Luzes top', 40.00, '02:00:00', 'ATIVO', 0, 'Serviço de manicure', NULL);
 
 INSERT INTO pagamento (forma, taxa)
 VALUES 
@@ -379,7 +371,7 @@ VALUES
 
 -- Simulando cancelamento futuro
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
-VALUES (2, 3, 4, 2, 1, '2025-05-26', '16:00:00', '16:40:00', 40.00);
+VALUES (2, 3, 4, 2, 1, '2025-06-26', '16:00:00', '16:40:00', 40.00);
 
 INSERT INTO desc_cancelamento (descricao, agendamento_id)
 VALUES ('Cliente teve imprevisto no trabalho', 3);
@@ -581,3 +573,5 @@ ORDER BY
 
 SELECT * FROM agendamento WHERE ((data > CURDATE()) OR (data = CURDATE() AND inicio > CURTIME())) AND usuario_id = 2 ORDER BY data ASC, inicio ASC LIMIT 1;
 SELECT * FROM historico_agendamento;
+SELECT * FROM agendamento;
+SELECT * FROM agendamento WHERE funcionario_id = 2;
