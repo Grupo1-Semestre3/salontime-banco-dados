@@ -1,9 +1,9 @@
 create database salon_time;
 
+
 -- drop database salon_time;
 
 use salon_time;
-
 
 show tables;
 
@@ -17,18 +17,6 @@ CREATE TABLE info_salao (
     cidade VARCHAR(45),
     estado VARCHAR(45),
     complemento VARCHAR(45)
-);
-
-CREATE TABLE cupom (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(45),
-    desconto int,
-    descricao VARCHAR(45),
-    codigo VARCHAR(45),
-    ativo TINYINT,
-    inicio DATE,
-    fim DATE,
-    tipo_destinatario VARCHAR(45)
 );
 
 CREATE TABLE tipo_usuario (
@@ -48,7 +36,6 @@ CREATE TABLE usuario (
     foto longblob,
     data_nascimento Date,
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-    ativo tinyint default true,
     FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
 );
 
@@ -87,7 +74,6 @@ CREATE TABLE agendamento (
     funcionario_id INT,
     servico_id INT,
     usuario_id INT,
-    cupom_id INT,
     status_agendamento_id INT,
     pagamento_id INT,
     data DATE,
@@ -95,7 +81,6 @@ CREATE TABLE agendamento (
     fim TIME,
     preco DECIMAL(10,2),
     FOREIGN KEY (funcionario_id) REFERENCES usuario(id),
-    FOREIGN KEY (cupom_id) REFERENCES cupom(id),
     FOREIGN KEY (servico_id) REFERENCES servico(id),
     FOREIGN KEY (status_agendamento_id) REFERENCES status_agendamento(id),
     FOREIGN KEY (usuario_id) REFERENCES usuario(id),
@@ -113,12 +98,11 @@ CREATE TABLE historico_agendamento (
     agendamento_usuario_id INT,
     agendamento_status_agendamento_id INT,   
     agendamento_pagamento_id INT,   
-    taxa_utilizada DECIMAL(5,2),
     FOREIGN KEY (agendamento_id) REFERENCES agendamento(id),
     inicio time,
     fim time,
     preco decimal(10,2)
-);	
+);
 
 CREATE TABLE funcionamento (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -126,9 +110,7 @@ CREATE TABLE funcionamento (
     inicio TIME,
     fim TIME,
     aberto TINYINT,
-    capacidade INT,
-    funcionario_id INT,
-    FOREIGN KEY (funcionario_id) REFERENCES usuario(id)
+    capacidade INT
 );
 
 
@@ -146,9 +128,7 @@ CREATE TABLE horario_excecao (
     inicio TIME,
     fim TIME,
     aberto TINYINT,
-    capacidade INT,
-	funcionario_id INT,
-    FOREIGN KEY (funcionario_id) REFERENCES usuario(id)
+    capacidade INT
 );
 
 CREATE TABLE cupom_configuracao (
@@ -168,6 +148,16 @@ CREATE TABLE avaliacao (
     FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
+CREATE TABLE cupom (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(45),
+    descricao VARCHAR(45),
+    codigo VARCHAR(45),
+    ativo TINYINT,
+    inicio DATE,
+    fim DATE,
+    tipo_destinatario VARCHAR(45)
+);
 
 CREATE TABLE cupom_destinado (
     id INT PRIMARY KEY auto_increment,
@@ -178,17 +168,6 @@ CREATE TABLE cupom_destinado (
     FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
-CREATE TABLE copum_configuracao (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    intervalo_atendimento INT,
-    porcentagem_desconto INT
-);
-
-
-INSERT INTO copum_configuracao (intervalo_atendimento, porcentagem_desconto)
-VALUES (10, 10);
-
-
 
 
 -- ----------------------------- TRIGGERS ------------------------
@@ -198,12 +177,6 @@ CREATE TRIGGER trg_historico_agendamento
 AFTER INSERT ON agendamento
 FOR EACH ROW
 BEGIN
-    DECLARE v_taxa DECIMAL(5,2);
-
-    SELECT taxa INTO v_taxa
-    FROM pagamento
-    WHERE id = NEW.pagamento_id;
-
     INSERT INTO historico_agendamento (
         data_horario,
         agendamento_id,
@@ -214,8 +187,7 @@ BEGIN
         agendamento_pagamento_id,
         inicio,
         fim,
-        preco,
-        taxa_utilizada
+        preco
     )
     VALUES (
         NOW(),
@@ -227,8 +199,7 @@ BEGIN
         NEW.pagamento_id,
         NEW.inicio,
         NEW.fim,
-        NEW.preco,
-        v_taxa
+        NEW.preco
     );
 END;
 //
@@ -239,12 +210,6 @@ CREATE TRIGGER trg_historico_agendamento_update
 AFTER UPDATE ON agendamento
 FOR EACH ROW
 BEGIN
-    DECLARE v_taxa DECIMAL(5,2);
-
-    SELECT taxa INTO v_taxa
-    FROM pagamento
-    WHERE id = NEW.pagamento_id;
-
     INSERT INTO historico_agendamento (
         data_horario,
         agendamento_id,
@@ -255,8 +220,7 @@ BEGIN
         agendamento_pagamento_id,
         inicio,
         fim,
-        preco,
-        taxa_utilizada
+        preco
     )
     VALUES (
         NOW(),
@@ -268,16 +232,22 @@ BEGIN
         NEW.pagamento_id,
         NEW.inicio,
         NEW.fim,
-        NEW.preco,
-        v_taxa
+        NEW.preco
     );
 END;
 //
 DELIMITER ;
 
-
 -- DADOS INICIAIS
 
+INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade) VALUES
+('TUESDAY', '10:00:00', '19:00:00', 1, 2),
+('WEDNESDAY', '10:00:00', '19:00:00', 1, 2),
+('THURSDAY', '10:00:00', '19:00:00', 1, 2),
+('FRIDAY', '10:00:00', '19:00:00', 1, 2),
+('SATURDAY', '10:00:00', '19:00:00', 1, 2),
+('SUNDAY', NULL, NULL, 0, NULL),
+('MONDAY', NULL, NULL, 0, NULL);
 
 INSERT INTO status_agendamento (status) VALUES 
 ('AGENDADO'), 
@@ -302,63 +272,18 @@ VALUES
 (3, 'Joana Souza', '11988887777', '12345678900', 'joana@salontime.com', 'joana123', 0, NULL, '1990-05-15'),
 (3, 'Carlos Mendes', '11977776666', '23456789001', 'carlos@salontime.com', 'carlos123', 0, NULL, '1985-09-30');
 
--- FUNCIONÁRIOS
-INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto, data_nascimento) 
-VALUES  
-(3, 'Teste sSouza', '11988887777', '12345678900', 'jo2ana@salontime.com', 'joana123', 0, NULL, '1990-05-15');
-
 -- CLIENTES
 INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto, data_nascimento) 
 VALUES  
 (2, 'Maria Clara', '11966665555', '34567890123', 'maria@cliente.com', 'maria123', 0, NULL, '1995-12-20'),
 (2, 'Lucas Lima', '11955554444', '45678901234', 'lucas@cliente.com', 'lucas123', 0, NULL, '2000-03-10');
 
-INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funcionario_id) VALUES
-('TUESDAY', '10:00:00', '19:00:00', 1, 1, 1),
-('WEDNESDAY', '10:00:00', '19:00:00', 1, 1, 1),
-('THURSDAY', '10:00:00', '19:00:00', 1, 1, 1),
-('FRIDAY', '10:00:00', '19:00:00', 1, 1, 1),
-('SATURDAY', '10:00:00', '19:00:00', 1, 1, 1),
-('SUNDAY', NULL, NULL, 0, NULL, 1),
-('MONDAY', NULL, NULL, 0, NULL, 1);
-
-INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funcionario_id) VALUES
-('TUESDAY', '10:00:00', '19:00:00', 1, 1, 2),
-('WEDNESDAY', '10:00:00', '19:00:00', 1, 1, 2),
-('THURSDAY', '10:00:00', '19:00:00', 1, 1, 2),
-('FRIDAY', '10:00:00', '19:00:00', 1, 1, 2),
-('SATURDAY', '10:00:00', '19:00:00', 1, 1, 2),
-('SUNDAY', NULL, NULL, 0, NULL, 1),
-('MONDAY', NULL, NULL, 0, NULL, 1);
-
-INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funcionario_id) VALUES
-('TUESDAY', '10:00:00', '19:00:00', 1, 1, 3),
-('WEDNESDAY', '10:00:00', '19:00:00', 1, 1, 3),
-('THURSDAY', '10:00:00', '19:00:00', 1, 1, 3),
-('FRIDAY', '10:00:00', '19:00:00', 1, 1, 3),
-('SATURDAY', '10:00:00', '19:00:00', 1, 1, 3),
-('SUNDAY', NULL, NULL, 0, NULL, 1),
-('MONDAY', NULL, NULL, 0, NULL, 1);
-
-INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funcionario_id) VALUES
-('TUESDAY', '10:00:00', '19:00:00', 1, 1, 6),
-('WEDNESDAY', '10:00:00', '19:00:00', 1, 1, 6),
-('THURSDAY', '10:00:00', '19:00:00', 1, 1, 6),
-('FRIDAY', '10:00:00', '19:00:00', 1, 1, 6),
-('SATURDAY', '10:00:00', '19:00:00', 1, 1, 6),
-('SUNDAY', NULL, NULL, 0, NULL, 1),
-('MONDAY', NULL, NULL, 0, NULL, 1);
 
 INSERT INTO servico (nome, preco, tempo, status, simultaneo, descricao, foto)
 VALUES 
 ('Corte Feminino', 70.00, '00:45:00', 'ATIVO', 1, 'Corte feminino completo', NULL),
 ('Corte Masculino', 50.00, '00:30:00', 'ATIVO', 1, 'Corte masculino tradicional', NULL),
-('Manicure', 40.00, '00:40:00', 'ATIVO', 0, 'Serviço de manicure', NULL),
-('Luzes top', 40.00, '02:00:00', 'ATIVO', 0, 'Serviço de manicure', NULL);
-
-INSERT INTO servico (nome, preco, tempo, status, simultaneo, descricao, foto)
-VALUES 
-('Dia noive', 70.00, '00:30:00', 'ATIVO', 1, 'Dia da noive', NULL);
+('Manicure', 40.00, '00:40:00', 'ATIVO', 0, 'Serviço de manicure', NULL);
 
 INSERT INTO pagamento (forma, taxa)
 VALUES 
@@ -372,31 +297,27 @@ VALUES
 (2, 1), 
 (2, 3);
 
+-- Carlos faz Corte Masculino
+INSERT INTO funcionario_competencia (funcionario_id, servico_id)
+VALUES 
+(3, 2);
+
+
 INSERT INTO funcionario_competencia (funcionario_id, servico_id)
 VALUES 
 (2, 2);
 
 -- Maria Clara agendou Corte Feminino com Joana
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
-VALUES (3, 1, 4, 1, 1, '2025-05-20', '15:00:00', '15:45:00', 70.00);
--- Maria Clara agendou Corte Feminino com Joana
-INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
-VALUES (1, 1, 4, 1, 1, '2025-05-20', '15:00:00', '15:45:00', 70.00);
-
--- Maria Clara agendou Corte Feminino com Joana
-INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
-VALUES (1, 1, 4, 1, 1, '2025-05-20', '10:00:00', '11:00:00', 70.00);
-
+VALUES (2, 1, 4, 1, 1, '2025-05-20', '14:00:00', '14:45:00', 70.00);
 
 -- Lucas Lima agendou Corte Masculino com Carlos
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
-VALUES (6, 8, 5, 1, 2, '2025-05-27', '10:00:00', '12:00:00', 50.00);
+VALUES (3, 2, 5, 1, 2, '2025-05-21', '15:00:00', '15:30:00', 50.00);
 
 -- Lucas Lima agendou Corte Masculino com Carlos
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
 VALUES (3, 2, 4, 1, 2, '2025-05-27', '15:00:00', '15:30:00', 50.00);
-
-update agendamento set status_agendamento_id = 2 where id =3;
 
 INSERT INTO avaliacao (agendamento_id, usuario_id, nota_servico, descricao_servico, data_horario)
 VALUES 
@@ -406,7 +327,7 @@ VALUES
 
 -- Simulando cancelamento futuro
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
-VALUES (2, 3, 4, 2, 1, '2025-06-26', '16:00:00', '16:40:00', 40.00);
+VALUES (2, 3, 4, 2, 1, '2025-05-26', '16:00:00', '16:40:00', 40.00);
 
 INSERT INTO desc_cancelamento (descricao, agendamento_id)
 VALUES ('Cliente teve imprevisto no trabalho', 3);
@@ -447,8 +368,6 @@ VALUES
 
 INSERT INTO cupom_configuracao (intervalo_atendimento, porcentagem_desconto) VALUES (10, 10);
 
-select * from  agendamento;
-
 SELECT 
     s.id,
     s.nome,
@@ -480,311 +399,13 @@ select * from usuario;
 
 SELECT * FROM agendamento WHERE (data < CURDATE() AND usuario_id = 4) OR (data = CURDATE() AND inicio < CURTIME()) ORDER BY data ASC, inicio ASC;	
 
-select * from agendamento;
-
-SELECT inicio, fim
-FROM agendamento
-WHERE data = '2025-05-20';
-
-SELECT 
-    a.inicio, 
-    a.fim,
-    (SELECT f.capacidade 
-     FROM funcionamento f 
-     WHERE f.funcionario_id = a.funcionario_id 
-     LIMIT 1) AS capacidade
-FROM 
-    agendamento a
-WHERE 
-    a.data = '2025-05-20';
-
-
--- -------------------------- VIEW ----------------------------
-
-
--- KPIS DE ATENDIMENTOS, FATURAMENTO E ATENDIMENTOS CANCELADOS
-
-CREATE VIEW vw_agendamentos_mensal AS
-SELECT 
-    YEAR(data_horario) AS ano,
-    MONTH(data_horario) AS mes,
-    COUNT(*) AS total_agendamentos,
-    SUM(preco) AS faturamento_total,
-    SUM(CASE WHEN agendamento_status_agendamento_id = 2 THEN 1 ELSE 0 END) AS total_cancelados
-FROM 
-    historico_agendamento
-GROUP BY 
-    YEAR(data_horario),
-    MONTH(data_horario)
-ORDER BY
-    ano,
-    mes;
-    
-select * from vw_agendamentos_mensal;
-
-
--- KPI DE USUARIO CADASTRADOS
-
-CREATE VIEW vw_cadastros_mensais_usuarios AS
-SELECT 
-    YEAR(data_criacao) AS ano,
-    MONTH(data_criacao) AS mes,
-    COUNT(*) AS total_cadastros
-FROM 
-    usuario
-GROUP BY 
-    YEAR(data_criacao),
-    MONTH(data_criacao)
-ORDER BY 
-    ano,
-    mes;
-    
-SELECT 
-    atual.ano,
-    atual.mes,
-    atual.total_cadastros,
-    anterior.total_cadastros AS cadastros_mes_anterior,
-    CASE 
-        WHEN anterior.total_cadastros IS NULL OR anterior.total_cadastros = 0 THEN NULL
-        ELSE ROUND(
-            (atual.total_cadastros - anterior.total_cadastros) * 100.0 / anterior.total_cadastros, 
-            2
-        )
-    END AS variacao_percentual
-FROM vw_cadastros_mensais_usuarios atual
-LEFT JOIN vw_cadastros_mensais_usuarios anterior
-    ON (
-        (anterior.ano = atual.ano AND anterior.mes = atual.mes - 1)
-        OR (anterior.ano = atual.ano - 1 AND atual.mes = 1 AND anterior.mes = 12)
-    )
-WHERE atual.ano = 2025 AND atual.mes = 8;
-
-
-
-
--- GRÁFICO QTD ATENDIMENTO POR MES
-
-CREATE TABLE calendario_2025 (
-  dia DATE PRIMARY KEY
-);
-
--- Inserindo de 2025-01-01 até 2025-12-31
-INSERT INTO calendario_2025 (dia)
-SELECT DATE('2025-01-01') + INTERVAL seq DAY
-FROM (
-  SELECT a + b * 10 AS seq
-  FROM (
-    SELECT 0 a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
-    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
-  ) AS unidades,
-  (
-    SELECT 0 b UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
-    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
-    UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 UNION ALL SELECT 13 UNION ALL SELECT 14
-    UNION ALL SELECT 15 UNION ALL SELECT 16 UNION ALL SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19
-    UNION ALL SELECT 20 UNION ALL SELECT 21 UNION ALL SELECT 22 UNION ALL SELECT 23 UNION ALL SELECT 24
-    UNION ALL SELECT 25 UNION ALL SELECT 26 UNION ALL SELECT 27 UNION ALL SELECT 28 UNION ALL SELECT 29
-    UNION ALL SELECT 30 UNION ALL SELECT 31 UNION ALL SELECT 32 UNION ALL SELECT 33 UNION ALL SELECT 34
-    UNION ALL SELECT 35
-  ) AS dezenas
-  WHERE a + b * 10 <= 364
-) AS dias;
-
-CREATE VIEW atendimentos_por_dia AS
-SELECT 
-  c.dia,
-  COUNT(h.id) AS total_atendimentos
-FROM calendario_2025 c
-LEFT JOIN historico_agendamento h
-  ON DATE(h.data_horario) = c.dia
-GROUP BY c.dia
-ORDER BY c.dia;
-
-SELECT * FROM atendimentos_por_dia;
-
--- Suponha que você quer filtrar por Setembro de 2025 (mês 9 e ano 2025)
--- Você pode passar esses valores como parâmetros em uma aplicação
-
-SELECT 
-    DATE_FORMAT(a.dia, '%d') AS dia_mes_atual,
-    a.total_atendimentos AS qtd_atual,
-    DATE_FORMAT(b.dia, '%d') AS dia_mes_anterior,
-    b.total_atendimentos AS qtd_anterior
-FROM atendimentos_por_dia a
-LEFT JOIN atendimentos_por_dia b
-  ON DAY(a.dia) = DAY(b.dia)
-  AND MONTH(b.dia) = 
-        CASE 
-            WHEN MONTH(a.dia) = 1 THEN 12
-            ELSE MONTH(a.dia) - 1
-        END
-  AND YEAR(b.dia) =
-        CASE 
-            WHEN MONTH(a.dia) = 1 THEN YEAR(a.dia) - 1
-            ELSE YEAR(a.dia)
-        END
-WHERE MONTH(a.dia) = 9
-  AND YEAR(a.dia) = 2025
-ORDER BY a.dia;
-
-
-
-
-
--- GRÁFICO DE ATENDIMENTO POR SERVIÇO
-
-CREATE OR REPLACE VIEW view_atendimentos_por_servico_mes AS
-SELECT
-    YEAR(a.data) AS ano,
-    MONTH(a.data) AS mes,
-    s.id AS servico_id,
-    s.nome AS nome_servico,
-    COUNT(*) AS quantidade_atendimentos
-FROM
-    agendamento a
-JOIN
-    servico s ON a.servico_id = s.id
--- Aqui: opcional filtro de status do serviço, se existir:
-WHERE
-    s.status = 'ATIVO'
-GROUP BY
-    YEAR(a.data),
-    MONTH(a.data),
-    s.id,
-    s.nome
-ORDER BY
-    ano, mes, nome_servico;
-
-
-
-    
-    select * from view_atendimentos_por_servico_mes;
-
-WITH data_base AS (
-  SELECT 2025 AS ano, 10 AS mes
-),
-mes_anterior AS (
-  SELECT
-    CASE WHEN mes = 1 THEN ano - 1 ELSE ano END AS ano,
-    CASE WHEN mes = 1 THEN 12 ELSE mes - 1 END AS mes
-  FROM data_base	
-)
-SELECT
-    atual.servico_id,
-    atual.nome_servico,
-    atual.quantidade_atendimentos AS qtd_atual,
-    COALESCE(anterior.quantidade_atendimentos, 0) AS qtd_anterior
-FROM view_atendimentos_por_servico_mes AS atual
-JOIN data_base ON atual.ano = data_base.ano AND atual.mes = data_base.mes
-LEFT JOIN view_atendimentos_por_servico_mes AS anterior
-  ON atual.servico_id = anterior.servico_id
-  AND anterior.ano = (SELECT ano FROM mes_anterior)
-  AND anterior.mes = (SELECT mes FROM mes_anterior)
-ORDER BY atual.nome_servico;
-
-
-
-
-
-
-
-
-
--- ------------------------------------------------------------------------- ***** ---------------------------------------
-
-use salon_time;
-
-select * from agendamento;
-
--- Selects 
- select * from usuario where senha = "maria123" and email = "maria@cliente.com" and ativo = true;
-
-select * from usuario;
-
-update usuario set email = "maikondouglas6050@gmail.com" where id  <= 4;
-
-select * from agendamento;
-
-
-delete from usuario where id = 3;
-
-
-select 
-    atual.ano,
-    atual.mes,
-    atual.total_atendimentos,
-    atual.total_cancelados,
-    atual.faturamento_total,
-    
-    case 
-        when anterior.total_atendimentos = 0 or anterior.total_atendimentos is null then null
-        else round(((atual.total_atendimentos - anterior.total_atendimentos) / anterior.total_atendimentos * 100), 2)
-    end as total_atendimentos_taxa,
-
-    case 
-        when anterior.total_cancelados = 0 or anterior.total_cancelados is null then null
-        else round(((atual.total_cancelados - anterior.total_cancelados) / anterior.total_cancelados * 100), 2)
-    end as total_cancelados_taxa,
-
-    case 
-        when anterior.faturamento_total = 0 or anterior.faturamento_total is null then null
-        else round(((atual.faturamento_total - anterior.faturamento_total) / anterior.faturamento_total * 100), 2)
-    end as faturamento_total_taxa
-
-from vw_agendamentos_mensal atual
-left join vw_agendamentos_mensal anterior
-    on anterior.ano = atual.ano
-    and anterior.mes = atual.mes - 1
-
-where atual.ano = 2025 and atual.mes = 6;
-
-select * from usuario;
-
-update agendamento set status_agendamento_id = 5 where id = 18;
-
-select * from agendamento;
-
-
-SELECT * 
-FROM agendamento 
-WHERE 
-  funcionario_id = 3 
-  AND status_agendamento_id != 1
-  AND (
-    data < CURDATE() 
-    OR 
-    (data = CURDATE() AND inicio < CURTIME())
-  )
-ORDER BY data ASC, inicio ASC;
-
+SELECT * FROM agendamento WHERE (data > CURDATE() AND funcionario_id = 3) OR (data = CURDATE() AND inicio > CURTIME()) ORDER BY data ASC, inicio ASC;
 
 select * from cupom;
 
-update cupom_destinado set usado = true where id < 10;
+select * from cupom;
 
-select * from cupom_destinado;
-update cupom_destinado set usado = false where id = 3;
-insert into cupom_destinado (cupom_id, usuario_id, usado) values (1,3,false);
+ALTER TABLE cupom ADD COLUMN desconto INT NULL;
 
-select * from agendamento;
-
-
-
-update agendamento set status_agendamento_id = 4 where id = 16;
-
-SELECT
-        *  
-    FROM
-        agendamento  
-    WHERE
-        funcionario_id = 1 
-        AND (
-            data < CURDATE()      
-            OR      (
-                data = CURDATE() 
-                AND inicio < CURTIME()
-            )   
-        ) 
-    ORDER BY
-        data ASC,
-        inicio ASC;                  
+select * from cupom;
+	
