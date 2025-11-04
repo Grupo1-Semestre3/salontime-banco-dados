@@ -294,7 +294,7 @@ select
             total_cancelados as totalCancelados, 
             faturamento_total as faturamentoTotal
         from vw_agendamentos_mensal 
-        where ano = 2025 and mes = 5;
+        where ano = 2025 and mes = 11;
 
 -- KPI DE USUARIO CADASTRADOS
 
