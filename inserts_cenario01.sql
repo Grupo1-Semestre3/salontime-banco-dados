@@ -38,22 +38,22 @@ USE salon_time;
 -- ==============================
 INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto, data_nascimento)
 VALUES
-(1, 'Marina Souza', '11911111111', '11111111111', 'marina@example.com', '123456', 0, NULL, '1992-05-14'),
-(2, 'Ana Souza', '11911111111', '11111111111', 'ana.souza@example.com', '123456', 0, NULL, '1992-05-14'),
-(2, 'Bruno Lima', '11922222222', '22222222222', 'bruno.lima@example.com', '123456', 0, NULL, '1988-10-02'),
-(2, 'Carla Ferreira', '11933333333', '33333333333', 'carla.ferreira@example.com', '123456', 0, NULL, '1995-08-21'),
-(2, 'Daniel Oliveira', '11944444444', '44444444444', 'daniel.oliveira@example.com', '123456', 0, NULL, '1990-12-01'),
-(2, 'Eduarda Martins', '11955555555', '55555555555', 'eduarda.martins@example.com', '123456', 0, NULL, '1998-03-11'),
-(2, 'Felipe Costa', '11966666666', '66666666666', 'felipe.costa@example.com', '123456', 0, NULL, '1991-09-15'),
-(2, 'Gabriela Rocha', '11977777777', '77777777777', 'gabriela.rocha@example.com', '123456', 0, NULL, '1987-07-23'),
-(2, 'Henrique Santos', '11988888888', '88888888888', 'henrique.santos@example.com', '123456', 0, NULL, '1993-02-19'),
-(2, 'Isabela Moreira', '11999999998', '99999999998', 'isabela.moreira@example.com', '123456', 0, NULL, '1999-06-30'),
-(2, 'João Pedro', '11910101010', '10101010101', 'joao.pedro@example.com', '123456', 0, NULL, '1985-11-09'),
-(2, 'Karina Almeida', '11911112222', '11112222333', 'karina.almeida@example.com', '123456', 0, NULL, '1994-04-17'),
-(2, 'Lucas Menezes', '11922223333', '22223333444', 'lucas.menezes@example.com', '123456', 0, NULL, '1989-01-26'),
-(2, 'Mariana Dias', '11933334444', '33334444555', 'mariana.dias@example.com', '123456', 0, NULL, '1996-10-08'),
-(2, 'Nathalia Campos', '11944445555', '44445555666', 'nathalia.campos@example.com', '123456', 0, NULL, '1997-12-19'),
-(2, 'Otávio Teixeira', '11955556666', '55556666777', 'otavio.teixeira@example.com', '123456', 0, NULL, '1992-07-05');
+(1, 'Marina Souza', '11911111111', '11111111111', 'marina@gmail.com', '123456', 0, NULL, '1992-05-14'),
+(2, 'Ana Souza', '11911111111', '11111111111', 'ana.souza@gmail.com', '123456', 0, NULL, '1992-05-14'),
+(2, 'Bruno Lima', '11922222222', '22222222222', 'bruno.lima@gmail.com', '123456', 0, NULL, '1988-10-02'),
+(2, 'Carla Ferreira', '11933333333', '33333333333', 'carla.ferreira@gmail.com', '123456', 0, NULL, '1995-08-21'),
+(2, 'Daniel Oliveira', '11944444444', '44444444444', 'daniel.oliveira@gmail.com', '123456', 0, NULL, '1990-12-01'),
+(2, 'Eduarda Martins', '11955555555', '55555555555', 'eduarda.martins@gmail.com', '123456', 0, NULL, '1998-03-11'),
+(2, 'Felipe Costa', '11966666666', '66666666666', 'felipe.costa@gmail.com', '123456', 0, NULL, '1991-09-15'),
+(2, 'Gabriela Rocha', '11977777777', '77777777777', 'gabriela.rocha@gmail.com', '123456', 0, NULL, '1987-07-23'),
+(2, 'Henrique Santos', '11988888888', '88888888888', 'henrique.santos@gmail.com', '123456', 0, NULL, '1993-02-19'),
+(2, 'Isabela Moreira', '11999999998', '99999999998', 'isabela.moreira@gmail.com', '123456', 0, NULL, '1999-06-30'),
+(2, 'João Pedro', '11910101010', '10101010101', 'joao.pedro@gmail.com', '123456', 0, NULL, '1985-11-09'),
+(2, 'Karina Almeida', '11911112222', '11112222333', 'karina.almeida@gmail.com', '123456', 0, NULL, '1994-04-17'),
+(2, 'Lucas Menezes', '11922223333', '22223333444', 'lucas.menezes@gmail.com', '123456', 0, NULL, '1989-01-26'),
+(2, 'Mariana Dias', '11933334444', '33334444555', 'mariana.dias@gmail.com', '123456', 0, NULL, '1996-10-08'),
+(2, 'Nathalia Campos', '11944445555', '44445555666', 'nathalia.campos@gmail.com', '123456', 0, NULL, '1997-12-19'),
+(2, 'Otávio Teixeira', '11955556666', '55556666777', 'otavio.teixeira@gmail.com', '123456', 0, NULL, '1992-07-05');
 
 -- ==============================
 --  SERVIÇOS (7)
