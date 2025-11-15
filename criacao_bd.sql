@@ -1,8 +1,9 @@
 create database salon_time;
 
+
 -- drop database salon_time;
 
-use salon_time;
+use salon_time;	
 
 
 show tables;
@@ -23,7 +24,7 @@ CREATE TABLE cupom (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(45),
     desconto int,
-    descricao VARCHAR(45),
+    descricao VARCHAR(100),
     codigo VARCHAR(45),
     ativo TINYINT,
     inicio DATE,
@@ -268,52 +269,65 @@ DELIMITER ;
 -- -------------------------- VIEW ----------------------------
 
 
--- KPIS DE ATENDIMENTOS, FATURAMENTO E ATENDIMENTOS CANCELADOS
 
+-- KPIS DE ATENDIMENTOS, FATURAMENTO E ATENDIMENTOS CANCELADOS PERSONALIZADO
+
+CREATE OR REPLACE VIEW vw_agendamentos_base AS
+SELECT 
+    id,
+    data,
+    preco,
+    status_agendamento_id
+FROM agendamento;
+
+
+
+
+
+-- KPIS DE ATENDIMENTOS, FATURAMENTO E ATENDIMENTOS CANCELADOS
 CREATE OR REPLACE VIEW vw_agendamentos_mensal AS
 SELECT
     YEAR(a.data) AS ano,
     MONTH(a.data) AS mes,
-    COUNT(*) AS total_atendimentos,
+    SUM(CASE WHEN a.status_agendamento_id = 5 THEN 1 ELSE 0 END) AS total_atendimentos,
     SUM(CASE WHEN a.status_agendamento_id = 2 THEN 1 ELSE 0 END) AS total_cancelados,
-    SUM(CASE WHEN a.status_agendamento_id <> 2 THEN a.preco ELSE 0 END) AS faturamento_total
+    SUM(CASE WHEN a.status_agendamento_id = 5 THEN a.preco ELSE 0 END) AS faturamento_total
 FROM 
     agendamento a
 GROUP BY 
-    YEAR(a.data),
-    MONTH(a.data)
-ORDER BY 
-    ano,
-    mes;
+	YEAR(a.data), MONTH(a.data);
 
-    
-select 
-            ano as ano, 
-            mes as mes, 
-            total_atendimentos as totalAtendimentos, 
-            total_cancelados as totalCancelados, 
-            faturamento_total as faturamentoTotal
-        from vw_agendamentos_mensal 
-        where ano = 2025 and mes = 11;
+
+select * from vw_agendamentos_mensal;
+
+--  KPI DE USUARIO CADASTRADOS PERSONALIZADO
+CREATE OR REPLACE VIEW vw_cadastros_diarios_usuarios_personalizado AS
+SELECT 
+    DATE(u.data_criacao) AS data,
+    COUNT(*) AS total_cadastros
+FROM 
+    usuario u
+GROUP BY 
+    DATE(u.data_criacao);
+
+
+
 
 -- KPI DE USUARIO CADASTRADOS
 
-CREATE VIEW vw_cadastros_mensais_usuarios AS
+CREATE OR REPLACE VIEW vw_cadastros_mensais_usuarios AS
 SELECT 
-    YEAR(data_criacao) AS ano,
-    MONTH(data_criacao) AS mes,
+    DATE(u.data_criacao) AS data,
+    YEAR(u.data_criacao) AS ano,
+    MONTH(u.data_criacao) AS mes,
     COUNT(*) AS total_cadastros
 FROM 
-    usuario
+    usuario u
 GROUP BY 
-    YEAR(data_criacao),
-    MONTH(data_criacao)
-ORDER BY 
-    ano,
-    mes;
-    
-select * from  vw_cadastros_mensais_usuarios;
+    DATE(u.data_criacao), YEAR(u.data_criacao), MONTH(u.data_criacao);
 
+
+select * from vw_cadastros_mensais_usuarios;
 
 
 -- GRÁFICO QTD ATENDIMENTO POR MES
@@ -344,6 +358,7 @@ FROM (
   WHERE a + b * 10 <= 364
 ) AS dias;
 
+
 CREATE OR REPLACE VIEW atendimentos_por_dia AS
 SELECT 
   c.dia,
@@ -351,37 +366,39 @@ SELECT
 FROM calendario_2025 c
 LEFT JOIN agendamento a
   ON a.data = c.dia
+  AND a.status_agendamento_id = 5
 GROUP BY c.dia
 ORDER BY c.dia;
 
 
-SELECT * FROM atendimentos_por_dia;
+
+select * from vw_atendimentos_por_dia;
+
 
 -- GRÁFICO DE ATENDIMENTO POR SERVIÇO
 
 CREATE OR REPLACE VIEW view_atendimentos_por_servico_mes AS
 SELECT
-    DATE_FORMAT(a.data, '%Y-%m') AS mes,
+    YEAR(a.data) AS ano,
+    MONTH(a.data) AS mes,
     s.id AS servico_id,
     s.nome AS nome_servico,
-    COUNT(*) AS quantidade_atendimentos
-FROM
-    agendamento a
-JOIN
-    servico s ON a.servico_id = s.id
+    COUNT(a.id) AS quantidade_atendimentos
+FROM agendamento a
+JOIN servico s ON a.servico_id = s.id
 WHERE
     s.status = 'ATIVO'
+    AND a.status_agendamento_id = 5
 GROUP BY
-    DATE_FORMAT(a.data, '%Y-%m'),
+    YEAR(a.data),
+    MONTH(a.data),
     s.id,
-    s.nome
-ORDER BY
-    mes, nome_servico;
-
-    
-    select * from view_atendimentos_por_servico_mes;
+    s.nome;
 
 
+
+
+select * from view_atendimentos_por_servico_mes;
 
 
 

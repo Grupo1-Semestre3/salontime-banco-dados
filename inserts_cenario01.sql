@@ -39,6 +39,7 @@ USE salon_time;
 INSERT INTO usuario (tipo_usuario_id, nome, telefone, CPF, email, senha, login, foto, data_nascimento)
 VALUES
 (1, 'Marina Souza', '11911111111', '11111111111', 'marina@gmail.com', '123456', 0, NULL, '1992-05-14'),
+(1, 'Anna Mello', '11911111111', '11111111111', 'anna@gmail.com', '123456', 0, NULL, '1992-05-14'),
 (2, 'Ana Souza', '11911111111', '11111111111', 'ana.souza@gmail.com', '123456', 0, NULL, '1992-05-14'),
 (2, 'Bruno Lima', '11922222222', '22222222222', 'bruno.lima@gmail.com', '123456', 0, NULL, '1988-10-02'),
 (2, 'Carla Ferreira', '11933333333', '33333333333', 'carla.ferreira@gmail.com', '123456', 0, NULL, '1995-08-21'),
@@ -99,7 +100,7 @@ VALUES
 
 INSERT INTO copum_configuracao (intervalo_atendimento, porcentagem_desconto)
 VALUES
-(5, 10);
+(3, 10);
 
 -- ==============================
 --  PAGAMENTO (3 tipos)
@@ -117,39 +118,28 @@ INSERT INTO pagamento (forma, taxa) VALUES
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, cupom_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
 VALUES
 (1, 1, 2, 1, 1, 2, '2025-11-01', '09:00:00', '09:45:00', 80.00),
-(1, 2, 3, 2, 1, 1, '2025-11-03', '10:00:00', '10:30:00', 60.00),
-(1, 3, 4, 3, 1, 3, '2025-11-03', '11:00:00', '12:00:00', 90.00),
+(2, 2, 3, 2, 1, 1, '2025-11-03', '10:00:00', '10:30:00', 60.00),
+(2, 3, 4, 3, 1, 3, '2025-11-03', '11:00:00', '12:00:00', 90.00),
 (1, 4, 5, 4, 1, 1, '2025-11-04', '09:00:00', '11:00:00', 150.00),
-(1, 5, 6, 5, 1, 2, '2025-11-04', '11:15:00', '14:15:00', 200.00),
+(2, 5, 6, 5, 1, 2, '2025-11-04', '11:15:00', '14:15:00', 200.00),
 (1, 6, 7, 1, 1, 2, '2025-11-05', '09:00:00', '09:30:00', 40.00),
 (1, 7, 8, 2, 1, 3, '2025-11-05', '10:00:00', '10:50:00', 70.00),
-(1, 1, 9, 3, 1, 1, '2025-11-05', '11:00:00', '11:45:00', 80.00),
+(2, 1, 9, 3, 1, 1, '2025-11-05', '11:00:00', '11:45:00', 80.00),
 (1, 2, 10, 4, 1, 1, '2025-11-06', '09:00:00', '09:30:00', 60.00),
-(1, 3, 11, 5, 1, 2, '2025-11-06', '10:00:00', '11:00:00', 90.00),
-(1, 4, 12, 1, 1, 3, '2025-11-06', '11:15:00', '13:15:00', 150.00),
-(1, 5, 13, 2, 1, 2, '2025-11-07', '09:00:00', '12:00:00', 200.00),
-(1, 6, 14, 3, 1, 1, '2025-11-07', '13:00:00', '13:30:00', 40.00),
-(1, 7, 15, 4, 1, 2, '2025-11-07', '14:00:00', '14:50:00', 70.00),
-(1, 1, 2, 5, 1, 3, '2025-11-07', '15:00:00', '15:45:00', 80.00);
+(2, 3, 11, 5, 5, 2, '2025-11-06', '10:00:00', '11:00:00', 90.00),
+(1, 4, 12, 1, 5, 3, '2025-11-06', '11:15:00', '13:15:00', 150.00);
 
 -- Gerando horários alternados para a semana 07/10 a 07/11/2025
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, cupom_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
 VALUES
 (1, 1, 2, 1, 1, 2, '2025-10-07', '09:00:00', '09:45:00', 80.00),
-(1, 2, 3, 2, 1, 1, '2025-10-07', '10:00:00', '10:30:00', 60.00),
+(2, 2, 3, 2, 1, 1, '2025-10-07', '10:00:00', '10:30:00', 60.00),
 (1, 3, 4, 3, 1, 3, '2025-10-08', '11:00:00', '12:00:00', 90.00),
-(1, 4, 5, 4, 1, 1, '2025-10-08', '09:00:00', '11:00:00', 150.00),
+(2, 4, 5, 4, 1, 1, '2025-10-08', '09:00:00', '11:00:00', 150.00),
 (1, 5, 6, 5, 1, 2, '2025-10-11', '11:15:00', '14:15:00', 200.00),
-(1, 6, 7, 1, 1, 2, '2025-10-11', '09:00:00', '09:30:00', 40.00),
+(2, 6, 7, 1, 1, 2, '2025-10-11', '09:00:00', '09:30:00', 40.00),
 (1, 7, 8, 2, 1, 3, '2025-10-12', '10:00:00', '10:50:00', 70.00),
-(1, 1, 9, 3, 1, 1, '2025-10-12', '11:00:00', '11:45:00', 80.00),
-(1, 2, 10, 4, 1, 1, '2025-10-13', '09:00:00', '09:30:00', 60.00),
-(1, 3, 11, 5, 1, 2, '2025-10-13', '10:00:00', '11:00:00', 90.00),
-(1, 4, 12, 1, 1, 3, '2025-10-14', '11:15:00', '13:15:00', 150.00),
-(1, 5, 13, 2, 1, 2, '2025-10-15', '09:00:00', '12:00:00', 200.00),
-(1, 6, 14, 3, 1, 1, '2025-10-15', '13:00:00', '13:30:00', 40.00),
-(1, 7, 15, 4, 1, 2, '2025-10-18', '14:00:00', '14:50:00', 70.00),
-(1, 1, 2, 5, 1, 3, '2025-10-18', '15:00:00', '15:45:00', 80.00);
+(2, 1, 9, 3, 1, 1, '2025-10-12', '11:00:00', '11:45:00', 80.00);
 
 
 -- ==============================
@@ -166,12 +156,7 @@ VALUES
 (7, 8, 5, 'Escova ficou linda.', NOW()),
 (8, 9, 5, 'Corte maravilhoso.', NOW()),
 (9, 10, 4, 'Atendimento rápido e cordial.', NOW()),
-(10, 11, 5, 'Excelente hidratação.', NOW()),
-(11, 12, 4, 'Coloração bem feita.', NOW()),
-(12, 13, 5, 'Serviço impecável.', NOW()),
-(13, 14, 4, 'Tudo ótimo!', NOW()),
-(14, 15, 5, 'Experiência excelente.', NOW()),
-(15, 2, 5, 'Voltarei com certeza.', NOW());
+(10, 11, 5, 'Excelente hidratação.', NOW());
 
 
 -- ==============================
@@ -186,18 +171,53 @@ INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funciona
 ('SATURDAY', '10:00:00', '19:00:00', 1, 2, 1),
 ('SUNDAY', NULL, NULL, 0, NULL, 1);	
 
+update usuario set data_criacao = "2025-10-20 12:00:00" where id < 8;
+
+
+
+
+
+SELECT
+    CASE
+        WHEN a.total_agendamentos % cc.intervalo_atendimento = 0 
+             AND a.total_agendamentos > 0
+        THEN cc.intervalo_atendimento
+        ELSE a.total_agendamentos % cc.intervalo_atendimento
+    END AS pointsParcial,
+    cc.intervalo_atendimento AS pointsTotal,
+    CAST(cc.porcentagem_desconto AS DOUBLE) AS porcentagemCupom
+FROM (
+    SELECT 
+        h.agendamento_usuario_id,
+        COUNT(*) AS total_agendamentos
+    FROM historico_agendamento h
+    WHERE h.agendamento_status_agendamento_id = 5
+      AND h.agendamento_usuario_id = 2
+    GROUP BY h.agendamento_usuario_id
+) a
+CROSS JOIN copum_configuracao cc;
+
+
+
+
+
+select * from historico_agendamento;
 
 select * from agendamento;
 
-        
-        SELECT * 
-FROM agendamento 
-WHERE 
-  funcionario_id = 1
-  AND (
-    data < CURDATE() 
-    OR 
-    (data = CURDATE() AND inicio < CURTIME())
-  ) 
-  AND status_agendamento_id != 1
-ORDER BY data DESC, inicio DESC;
+
+INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, cupom_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
+VALUES
+(1, 1, 2, 1, 1, 2, '2025-10-07', '09:00:00', '09:45:00', 80.00);
+
+update historico_agendamento set agendamento_status_agendamento_id = 4 where id = 20;
+
+update agendamento set status_agendamento_id = 4 where id = 21;
+
+
+
+
+
+
+
+
