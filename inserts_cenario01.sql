@@ -98,7 +98,7 @@ VALUES
 --  CUPOM CONFIGURAÇÃO
 -- ==============================
 
-INSERT INTO copum_configuracao (intervalo_atendimento, porcentagem_desconto)
+INSERT INTO cupom_configuracao (intervalo_atendimento, porcentagem_desconto)
 VALUES
 (3, 10);
 
@@ -172,52 +172,5 @@ INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funciona
 ('SUNDAY', NULL, NULL, 0, NULL, 1);	
 
 update usuario set data_criacao = "2025-10-20 12:00:00" where id < 8;
-
-
-
-
-
-SELECT
-    CASE
-        WHEN a.total_agendamentos % cc.intervalo_atendimento = 0 
-             AND a.total_agendamentos > 0
-        THEN cc.intervalo_atendimento
-        ELSE a.total_agendamentos % cc.intervalo_atendimento
-    END AS pointsParcial,
-    cc.intervalo_atendimento AS pointsTotal,
-    CAST(cc.porcentagem_desconto AS DOUBLE) AS porcentagemCupom
-FROM (
-    SELECT 
-        h.agendamento_usuario_id,
-        COUNT(*) AS total_agendamentos
-    FROM historico_agendamento h
-    WHERE h.agendamento_status_agendamento_id = 5
-      AND h.agendamento_usuario_id = 2
-    GROUP BY h.agendamento_usuario_id
-) a
-CROSS JOIN copum_configuracao cc;
-
-
-
-
-
-select * from historico_agendamento;
-
-select * from agendamento;
-
-
-INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, cupom_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
-VALUES
-(1, 1, 2, 1, 1, 2, '2025-10-07', '09:00:00', '09:45:00', 80.00);
-
-update historico_agendamento set agendamento_status_agendamento_id = 4 where id = 20;
-
-update agendamento set status_agendamento_id = 4 where id = 21;
-
-
-
-
-
-
 
 

@@ -174,7 +174,7 @@ CREATE TABLE cupom_destinado (
     FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
-CREATE TABLE copum_configuracao (
+CREATE TABLE cupom_configuracao (
     id INT AUTO_INCREMENT PRIMARY KEY,
     intervalo_atendimento INT,
     porcentagem_desconto INT
@@ -372,7 +372,7 @@ ORDER BY c.dia;
 
 
 
-select * from vw_atendimentos_por_dia;
+
 
 
 -- GRÁFICO DE ATENDIMENTO POR SERVIÇO
