@@ -173,4 +173,5 @@ INSERT INTO funcionamento (dia_semana, inicio, fim, aberto, capacidade, funciona
 
 update usuario set data_criacao = "2025-10-20 12:00:00" where id < 8;
 
-
+select * from agendamento;
+update agendamento set status_agendamento_id = 5 where id = 4;

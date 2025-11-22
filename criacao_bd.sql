@@ -359,6 +359,19 @@ FROM (
 ) AS dias;
 
 
+CREATE OR REPLACE VIEW atendimentos_por_dia_personalizado AS
+SELECT 
+    c.dia,
+    COUNT(a.id) AS total_atendimentos
+FROM calendario_2025 c
+LEFT JOIN agendamento a
+    ON a.data = c.dia
+    AND a.status_agendamento_id = 5
+GROUP BY c.dia
+ORDER BY c.dia;
+
+
+
 CREATE OR REPLACE VIEW atendimentos_por_dia AS
 SELECT 
   c.dia,
@@ -376,6 +389,26 @@ ORDER BY c.dia;
 
 
 -- GRÁFICO DE ATENDIMENTO POR SERVIÇO
+
+
+CREATE OR REPLACE VIEW view_atendimentos_por_servico_mes_personalizado AS
+SELECT
+    a.data AS dia,
+    s.id AS servico_id,
+    s.nome AS nome_servico,
+    COUNT(a.id) AS quantidade_atendimentos
+FROM agendamento a
+JOIN servico s ON a.servico_id = s.id
+WHERE
+    s.status = 'ATIVO'
+    AND a.status_agendamento_id = 5
+GROUP BY
+    a.data,
+    s.id,
+    s.nome
+ORDER BY
+    a.data, s.nome;
+
 
 CREATE OR REPLACE VIEW view_atendimentos_por_servico_mes AS
 SELECT
