@@ -62,13 +62,13 @@ VALUES
 ('Hidratação Capilar', 90.00, '01:00:00', 'ATIVO', 1,
  'Tratamento intenso para restauração dos fios, com máscaras profissionais, massagem capilar, vaporização e selagem de cutículas.'),
 
-('Coloração', 150.00, '02:00:00', 'ATIVO', 1,
+('Coloração', 250.00, '02:00:00', 'ATIVO', 1,
  'Coloração completa com escolha de tonalidade, aplicação uniforme, tratamento pós-química e finalização com secagem profissional.'),
 
 ('Mechas / Luzes', 200.00, '03:00:00', 'ATIVO', 1,
  'Técnicas personalizadas de iluminação, incluindo mechas, luzes ou balayage, com descoloração supervisionada e tonalização profissional.'),
 
-('Dia de Noiva', 300.00, '04:00:00', 'ATIVO', 0,
+('Dia de Noiva', 1000.00, '04:00:00', 'ATIVO', 0,
  'Pacote exclusivo para noivas, incluindo preparo da pele, penteado, maquiagem completa, finalização especial e suporte até a sessão de fotos.'),
 
 ('Escova Modeladora', 70.00, '00:50:00', 'ATIVO', 0,
@@ -92,9 +92,7 @@ VALUES
 INSERT INTO cupom (nome, desconto, descricao, codigo, ativo, inicio, fim, tipo_destinatario)
 VALUES
 ('Beleza10', 10, '10% de desconto para todos', 'BELEZA10', 1, '2025-01-01', '2025-12-31', 'TODOS'),
-('PrimeiraVez', 15, 'Desconto de boas-vindas', 'PRIMEIRA15', 1, '2025-01-01', '2025-12-31', 'TODOS'),
-('Brilho20', 20, 'Desconto especial para coloração', 'BRILHO20', 1, '2025-01-01', '2025-12-31', 'TODOS'),
-('Cuide25', 25, 'Promoção de cuidados capilares', 'CUIDE25', 1, '2025-01-01', '2025-12-31', 'TODOS');
+('PrimeiraVez', 15, 'Desconto de boas-vindas', 'PRIMEIRA15', 1, '2025-01-01', '2025-12-31', 'TODOS');
 
 INSERT INTO cupom_configuracao (intervalo_atendimento, porcentagem_desconto)
 VALUES (5, 10);
@@ -120,9 +118,9 @@ VALUES
 (1,4,3,NULL,5,1,'2025-11-10','13:00','15:00',150),
 
 -- PENDENTES
-(1,7,5,NULL,4,3,'2025-11-12','15:00','15:50',70),
-(1,1,3,NULL,4,1,'2025-11-13','10:00','10:45',80),
-(1,3,4,NULL,4,2,'2025-11-14','16:00','17:00',90),
+(1,7,5,NULL,1,3,'2025-11-12','15:00','15:50',70),
+(1,1,3,NULL,1,1,'2025-11-13','10:00','10:45',80),
+(1,3,4,NULL,1,2,'2025-11-14','16:00','17:00',90),
 
 -- AGENDADOS
 (1,5,5,NULL,1,2,'2025-11-15','09:00','12:00',200),
@@ -148,31 +146,30 @@ VALUES
 INSERT INTO agendamento (funcionario_id, servico_id, usuario_id, cupom_id, status_agendamento_id, pagamento_id, data, inicio, fim, preco)
 VALUES
 -- CONCLUÍDOS
-(1,1,6,NULL,5,1,'2025-12-01','10:00','10:45',80),
+(1,1,6,NULL,5,1,'2025-12-02','10:00','10:45',80),
 (1,3,5,NULL,5,3,'2025-12-02','11:00','12:00',90),
 (1,7,4,NULL,5,1,'2025-12-03','09:00','10:00',70),
 (1,8,3,NULL,5,2,'2025-12-04','13:00','14:00',120),
 
 -- AGENDADOS
-(1,4,3,NULL,1,1,'2025-12-05','14:00','16:00',150),
-(1,5,4,NULL,1,3,'2025-12-06','09:00','12:00',200),
-(1,3,5,NULL,1,1,'2025-12-07','10:00','11:00',90),
+(1,4,3,NULL,1,1,'2025-12-13','14:00','16:00',150),
+(1,3,5,NULL,1,1,'2025-12-12','10:00','11:00',90),
 
 -- PENDENTES
-(1,1,5,NULL,4,2,'2025-12-10','11:00','11:45',80),
-(1,2,6,NULL,4,1,'2025-12-11','09:00','09:30',60),
+(1,1,5,NULL,1,2,'2025-12-3','11:00','11:45',80),
+(1,2,6,NULL,1,1,'2025-12-4','09:00','09:30',60),
 
 -- CANCELADOS
 (1,7,3,NULL,2,3,'2025-12-12','15:00','16:00',70),
 
 -- AUSENTE
-(1,8,4,NULL,3,1,'2025-12-13','12:00','13:00',120),
+(1,8,4,NULL,3,1,'2025-12-02','12:00','13:00',120),
 
 -- MAIS CONCLUÍDOS
-(1,3,5,NULL,5,2,'2025-12-14','14:00','15:00',90),
-(1,4,6,NULL,5,1,'2025-12-15','15:00','17:00',150),
-(1,2,4,NULL,5,3,'2025-12-16','10:00','10:30',60),
-(1,1,3,NULL,5,1,'2025-12-17','09:00','09:45',80);
+(1,4,6,NULL,5,1,'2025-12-06','15:00','17:00',150),
+(1,2,4,NULL,5,3,'2025-12-08','10:00','10:30',60),
+(1,1,3,NULL,5,1,'2025-12-06','09:00','09:45',80),
+(1,6,3,NULL,5,1,'2025-12-04','09:00','09:45',80);
 
 -- ==============================
 -- AVALIAÇÕES APENAS DOS CONCLUÍDOS
@@ -188,7 +185,9 @@ VALUES
 (17, 4, 5, 'As mechas ficaram naturais e luminosas, com acabamento excelente. O profissional demonstrou domínio da técnica!', NOW()),
 (18, 3, 4, 'A escova modeladora deixou meus cabelos sedosos e com ótimo movimento. Fui atendida pontualmente e com atenção.', NOW()),
 (19, 5, 5, 'Corte realizado de forma ágil, com resultado muito profissional. Ambiente agradável e atendimento de alto nível.', NOW()),
-(20, 5, 4, 'Penteado elegante, ideal para ocasiões especiais. Fui ouvida sobre preferências e o resultado superou expectativas.', NOW());
+(20, 5, 4, 'Penteado elegante, ideal para ocasiões especiais. Fui ouvida sobre preferências e o resultado superou expectativas.', NOW()),
+(34, 2, 5, 'Simplesmente perfeito, make não borrou e deu tudo certo no meu casamento, super bem feito!!!', NOW());
+
 -- ==============================
 -- FUNCIONAMENTO DO SALÃO
 -- ==============================
@@ -215,4 +214,4 @@ INSERT INTO desc_cancelamento (descricao, agendamento_id) VALUES
 ("Agendei o serviço errado",15),
 ("Me enganei com minha agenda, peço desculpas",30);
 
-select * from avaliacao;
+select * from agendamento where usuario_id = 4 and status_agendamento_id = 5;
